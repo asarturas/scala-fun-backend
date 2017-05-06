@@ -4,12 +4,14 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+import akka.stream.scaladsl.Source
+import akka.util.ByteString
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.Future
 import scala.io.StdIn
+import scala.util.Random
 
 object WebServer {
 
@@ -33,10 +35,24 @@ object WebServer {
     // needed for the future flatMap/onComplete in the end
     implicit val executionContext = system.dispatcher
 
+    // streams are re-usable so we can define it here
+    // and use it for every request
+    val numbers = Source.fromIterator(() => Iterator.continually(Random.nextInt()))
+
     val route =
       path("hello") {
         get {
           complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+        }
+      } ~ path("random") {
+        get {
+          complete(
+            HttpEntity(
+              ContentTypes.`text/plain(UTF-8)`,
+              // transform each number to a chunk of bytes
+              numbers.map(n => ByteString(s"$n\n"))
+            )
+          )
         }
       } ~ get {
         pathPrefix("item" / LongNumber) { id =>
