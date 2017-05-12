@@ -8,5 +8,5 @@ object Pocket {
   implicit val collectionDecoder: Decoder[Collection] = deriveDecoder[Collection]
 }
 
-case class Item(item_id: String, resolved_title: String, resolved_url: String, has_video: String)
+case class Item(item_id: String, resolved_title: String, resolved_url: String)
 case class Collection(list: Map[String, Item])
