@@ -1,5 +1,7 @@
 package fun.scala
 
-case class StoreNewVideos(videos: String)
+import fun.scala.pocket.{Collection, Item}
+
+case class StoreNewVideos(videos: Collection)
 case class GetRandomVideo()
-case class VideoData(video: String)
+case class VideoData(video: Item)

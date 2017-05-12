@@ -36,8 +36,6 @@ object WebServer {
   def fetchItem(itemId: Long): Future[Option[Item]] = Future(Some(Item(s"Random $itemId", itemId)))
   def saveOrder(order: Order): Future[Done] = Future(Done)
 
-  implicit val videoFormat = jsonFormat1(VideoData)
-
   def main(args: Array[String]) {
 
     implicit val system = ActorSystem("my-system")
@@ -52,48 +50,18 @@ object WebServer {
     val videoRepository = system.actorOf(Props[VideoRepository], "videoRepository")
     val pocketClient = system.actorOf(PocketClient.withProps(config.getString("pocketConsumerKey"), config.getString("pocketAccessToken")), "pocketClient")
 
+    //
+    import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
+    import io.circe.generic.auto._
+
     val route =
       path("getVideo") {
         get {
           implicit val timeout: Timeout = 5.seconds
           val videos: Future[VideoData] = (videoRepository ? GetRandomVideo()).mapTo[VideoData]
-          //Await.result(videos)
           complete(videos)
         }
-      } ~ path("hello") {
-        get {
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
-        }
-      } ~ path("random") {
-        get {
-          complete(
-            HttpEntity(
-              ContentTypes.`text/plain(UTF-8)`,
-              // transform each number to a chunk of bytes
-              numbers.map(n => ByteString(s"$n\n"))
-            )
-          )
-        }
-      } ~ get {
-        pathPrefix("item" / LongNumber) { id =>
-          // there might be no item for a given id
-          val maybeItem: Future[Option[Item]] = fetchItem(id)
-
-          onSuccess(maybeItem) {
-            case Some(item) => complete(item)
-            case None       => complete(StatusCodes.NotFound)
-          }
-        }
-      } ~ post {
-          path("create-order") {
-            entity(as[Order]) { order =>
-              val saved: Future[Done] = saveOrder(order)
-              onComplete(saved) { done =>
-                complete("{true}")
-              }
-            }
-          }
-        }
+      }
 
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
