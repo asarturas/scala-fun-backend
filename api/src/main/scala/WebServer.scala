@@ -1,21 +1,25 @@
-import scala.concurrent.duration._
-import scala.concurrent.Future
-import scala.io.StdIn
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{complete, get, path}
 import akka.stream.ActorMaterializer
-import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import fun.scala.{PocketAdapter, ReturnRandomVideo, Video, VideoRepository}
+import fun.scala.pocket.PocketAdapter
 import fun.scala.pocket.actors.PocketClient
+import fun.scala.{ReturnRandomVideo, Video, VideoRepository}
 
+import akka.pattern.ask
+
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.io.StdIn
+
+/**
+  * Created by arturas on 19/05/2017.
+  */
 object WebServer {
 
   val config = ConfigFactory.load().getConfig("scala-fun")
-
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   def main(args: Array[String]) {
 

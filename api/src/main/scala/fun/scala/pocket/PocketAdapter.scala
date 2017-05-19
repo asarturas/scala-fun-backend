@@ -1,7 +1,7 @@
-package fun.scala
+package fun.scala.pocket
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import fun.scala.pocket.{Item, ProcessParsedCollection}
+import fun.scala.{StoreVideos, Video}
 
 object PocketAdapter {
   def withProps(repository: ActorRef): Props = {
