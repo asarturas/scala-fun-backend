@@ -1,14 +1,19 @@
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.headers.Allow
 import akka.http.scaladsl.server.Directives.{complete, get, path}
+import akka.http.scaladsl.server.{MethodRejection, RejectionHandler}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import fun.scala.pocket.PocketAdapter
 import fun.scala.pocket.actors.PocketClient
 import fun.scala.{ReturnRandomVideo, Video, VideoRepository}
-
 import akka.pattern.ask
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes._
+
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -25,6 +30,20 @@ object WebServer {
 
     implicit val system = ActorSystem("my-system")
     implicit val materializer = ActorMaterializer()
+
+    implicit def rejectionHandler =
+    RejectionHandler.newBuilder().handleAll[MethodRejection] { rejections =>
+      val methods = rejections map (_.supported)
+      lazy val names = methods map (_.name) mkString ", "
+      respondWithHeader(Allow(methods)) {
+        options {
+          complete(s"Supported methods : $names.")
+        } ~
+        complete(MethodNotAllowed, s"HTTP method not allowed, supported methods: $names!")
+      }
+    }
+    .result()
+
 //    // needed for the future flatMap/onComplete in the end
     implicit val executionContext = system.dispatcher
 
@@ -38,7 +57,7 @@ object WebServer {
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
     import io.circe.generic.auto._
 
-    val route =
+    val route = cors() {
       path("next") {
         get {
           implicit val timeout: Timeout = 5.seconds
@@ -46,6 +65,7 @@ object WebServer {
           complete(video)
         }
       }
+    }
 
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 

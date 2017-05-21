@@ -1,0 +1,17 @@
+{
+  "name": "scala-fun-client",
+  "version": "0.0.1",
+  "description": "Scala.fun API client library.",
+  "licence": "MIT",
+  "maintainers": [
+    {
+      "name": "Arturas Smorgun",
+      "url": "https://github.com/asarturas"
+    }
+  ],
+  "contributors": [],
+  "main": "./index.js",
+  "typings": "./index.d.ts",
+  "dependencies": {},
+  "devDependencies": {}
+}
