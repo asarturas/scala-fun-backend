@@ -6,14 +6,13 @@ import akka.http.scaladsl.server.{MethodRejection, RejectionHandler}
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
-import fun.scala.pocket.PocketAdapter
 import fun.scala.pocket.actors.PocketClient
-import fun.scala.{ReturnRandomVideo, Video, VideoRepository}
+import fun.scala.{PocketAdapter, ReturnRandomVideo, Video, VideoRepository}
 import akka.pattern.ask
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.StatusCodes._
-
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
+import fun.scala.video.VideoPostProcessor
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -47,13 +46,16 @@ object WebServer {
 //    // needed for the future flatMap/onComplete in the end
     implicit val executionContext = system.dispatcher
 
+    // app actors
     val videoRepository = system.actorOf(Props[VideoRepository], "videoRepository")
-    val pocketAdapter = system.actorOf(PocketAdapter.withProps(videoRepository), "pocketAdapter")
+    val videoPostProcessor = system.actorOf(VideoPostProcessor.withProps(videoRepository), "videoPostProcessor")
+    val pocketAdapter = system.actorOf(PocketAdapter.withProps(videoPostProcessor), "pocketAdapter")
 
+    // pocket
     val (consumerKey, accessToken) = (config.getString("pocketConsumerKey"), config.getString("pocketAccessToken"))
     system.actorOf(PocketClient.withProps(consumerKey, accessToken, pocketAdapter), "pocketClient")
 
-    //
+    // circe for decoding responses in json
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
     import io.circe.generic.auto._
 
