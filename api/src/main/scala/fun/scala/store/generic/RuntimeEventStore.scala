@@ -1,6 +1,4 @@
-package fun.scala.store
-
-import fun.scala.store.generic.{AggregateId, Event, EventStore, StreamId, Version}
+package fun.scala.store.generic
 
 import scala.collection.mutable
 
