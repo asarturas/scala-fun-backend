@@ -1,9 +1,13 @@
 package fun.scala.store
 
-import fun.scala.store.generic.VersionNumber
+import fun.scala.store.generic.{Factory, Version}
 
-case class NumericVersion(version: Int = 0) extends VersionNumber {
-  def next: VersionNumber = NumericVersion(version + 1)
+case class NumericVersion(version: Int = 0) extends Version {
+  def next: Version = NumericVersion(version + 1)
+}
+
+trait NumericFactory[A] extends Factory[A] {
+  val versionZero: Version = NumericVersion()
 }
 
 object NumericVersion {

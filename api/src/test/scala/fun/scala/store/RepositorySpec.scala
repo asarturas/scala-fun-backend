@@ -12,12 +12,6 @@ class RepositorySpec extends FlatSpec with Matchers {
     // state
     case class Door(isLocked: Boolean, knocks: Int)
 
-    // init aggregate
-    implicit val DoorInit = Snapshot[Door](
-      id = DoorAggregateId(UUID.fromString("00000000-0000-0000-0000-000000000000")),
-      Door(isLocked = true, knocks = 0)
-    )
-
     // commands
     case class Knock() extends Command[Door]
     case class Lock() extends Command[Door]
@@ -35,14 +29,13 @@ class RepositorySpec extends FlatSpec with Matchers {
     }
 
     // aggregate -> define the event replay and command application
-    case class DoorAggregate(override val id: AggregateId[Door], override val version: VersionNumber, init: List[Event[Door]])
-      extends Aggregate[Door](id, version, init, DoorInit) {
+    case class DoorAggregate(override val id: AggregateId[Door], override val version: Version, init: List[Event[Door]])
+      extends Aggregate[Door](id, version, init, DoorFactory.initialSnapshot) {
       def replay(snapshot: Snapshot[Door], event: Event[Door]): Snapshot[Door] = event match {
         case Knocked()  => snapshot.copy(state = snapshot.state.copy(knocks = snapshot.state.knocks + 1))
         case Locked()   => snapshot.copy(state = snapshot.state.copy(isLocked = true))
         case Unlocked() => snapshot.copy(state = snapshot.state.copy(isLocked = false, knocks = 0))
       }
-
       def apply(command: Command[Door]): DoorAggregate = command match {
         case Knock() => DoorAggregate(id, version, events :+ Knocked())
         case Lock() => DoorAggregate(id, version, events :+ Locked())
@@ -50,26 +43,27 @@ class RepositorySpec extends FlatSpec with Matchers {
       }
     }
 
-    // implicit link to constructor
-    implicit def doorAggregateConstructor = DoorAggregate
-
-    // implicit link to aggregate id generator
-    implicit def doorAggregateIdGenerator = () => DoorAggregateId(UUID.randomUUID)
-
+    // factory
+    object DoorFactory extends NumericFactory[Door] {
+      val initialState = Door(isLocked = true, knocks = 0)
+      val zeroAggregateId = DoorAggregateId(UUID.fromString("00000000-0000-0000-0000-000000000000"))
+      def newAggregateId: AggregateId[Door] = DoorAggregateId(UUID.randomUUID)
+      def getAggregate(id: AggregateId[Door], version: Version, events: List[Event[Door]]): Aggregate[Door] =
+        DoorAggregate(id, version, events)
+    }
   }
 
   import DoorAggregate._
-  import NumericVersion._
 
-  val doorMemoryStore = new RuntimeEventStore(() => DoorAggregateId(UUID.randomUUID), NumericVersion())
-  val doorRepository = Repository(doorMemoryStore)
+  val doorMemoryStore = new RuntimeEventStore[Door]()
+  val doorRepository = Repository(doorMemoryStore, DoorFactory)
 
   it should "return none when asked for non existing aggregate" in {
     doorRepository.getById(DoorAggregateId(UUID.randomUUID)) should be(None)
   }
   it should "create initial aggregate" in {
     val newDoor = doorRepository.create
-    newDoor.snapshot should be(DoorInit)
+    newDoor.state should be(DoorFactory.initialState)
   }
   it should "store initial aggregate" in {
     val newDoor = doorRepository.create
@@ -103,7 +97,5 @@ class RepositorySpec extends FlatSpec with Matchers {
     savedUpdated.id should be(savedDoor.id)
     savedUpdated.events should be(savedDoor.events :+ Knocked() :+ Knocked())
   }
-
-  it should "ignore "
 
 }

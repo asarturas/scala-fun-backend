@@ -1,14 +1,11 @@
 package fun.scala.store.generic
 
-case class Repository[A](private val store: EventStore[A])
-                                 (implicit private val initAggregate: (AggregateId[A], VersionNumber, List[Event[A]]) => Aggregate[A],
-                                  implicit private val aggregateIdGenerator: () => AggregateId[A],
-                                  implicit private val zeroVersion: VersionNumber) {
-  def create: Aggregate[A] = initAggregate(aggregateIdGenerator(), zeroVersion, Nil)
+case class Repository[A](private val store: EventStore[A], private val factory: Factory[A]) {
+  def create: Aggregate[A] = factory.getAggregate(id = factory.newAggregateId)
 
   def getById(id: AggregateId[A]): Option[Aggregate[A]] = {
     store.eventsOf(id.toStreamId) match {
-      case Some((events, version)) => Some(initAggregate(id, version, events))
+      case Some((events, version)) => Some(factory.getAggregate(id, version, events))
       case None => None
     }
   }
@@ -17,13 +14,13 @@ case class Repository[A](private val store: EventStore[A])
     if (persistedVersion == aggregate.version) {
       aggregate
     } else {
-      initAggregate(aggregate.id, persistedVersion, aggregate.events)
+      factory.getAggregate(aggregate.id, persistedVersion, aggregate.events)
     }
   }
 
-  private def persist(id: StreamId, version: VersionNumber, events: List[Event[A]]): VersionNumber = {
-    if (version == zeroVersion) {
-      store.createStream(id, events)
+  private def persist(id: StreamId, version: Version, events: List[Event[A]]): Version = {
+    if (version == factory.versionZero) {
+      store.createStream(id, factory.versionZero.next, events)
       version.next
     } else if (store.appendEventsTo(id, version, events)) {
       version.next
