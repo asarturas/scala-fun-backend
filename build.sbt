@@ -2,6 +2,11 @@ name := "scala-fun"
 
 scalaVersion in ThisBuild := "2.12.2"
 
+git.gitTagToVersionNumber := { tag: String =>
+  if(tag matches "[0-9]+\\..*") Some(tag)
+  else None
+}
+
 lazy val backend = crossProject.crossType(CrossType.Pure).in(file("backend"))
   .settings(version := "0.0.2")
   .jvmSettings(
@@ -26,7 +31,7 @@ lazy val backend = crossProject.crossType(CrossType.Pure).in(file("backend"))
       "io.circe"      %%% "circe-parser" % "0.7.0"
     )
   )
-  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin, GitVersioning)
 
 lazy val backendJvm = backend.jvm
 lazy val backendJs = backend.js
