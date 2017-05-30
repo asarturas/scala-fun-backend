@@ -3,7 +3,7 @@ name := "scala-fun"
 scalaVersion in ThisBuild := "2.12.2"
 
 lazy val backend = crossProject.crossType(CrossType.Pure).in(file("backend"))
-  .settings(version := "0.0.1")
+  .settings(version := "0.0.2")
   .jvmSettings(
     resolvers += Resolver.bintrayRepo("hseeberger", "maven"),
     libraryDependencies ++= Seq(
@@ -13,7 +13,9 @@ lazy val backend = crossProject.crossType(CrossType.Pure).in(file("backend"))
       "ch.megard"         %% "akka-http-cors" % "0.2.1",
       "io.circe"          %% "circe-core" % "0.7.0",
       "io.circe"          %% "circe-generic" % "0.7.0",
-      "io.circe"          %% "circe-parser" % "0.7.0"
+      "io.circe"          %% "circe-parser" % "0.7.0",
+      "io.taig"           %% "communicator" % "3.2.2",
+      "io.lemonlabs"      %% "scala-uri" % "0.4.16"
     )
   )
   .jsSettings(
@@ -32,6 +34,7 @@ lazy val backendJs = backend.js
 lazy val apiClientJs: Project = (project in file("api-client-js"))
   .dependsOn(backendJs)
   .settings(name := "api-client-js")
+  .enablePlugins(ScalaJSPlugin)
 
 lazy val api: Project = (project in file("api"))
   .dependsOn(backendJvm)
