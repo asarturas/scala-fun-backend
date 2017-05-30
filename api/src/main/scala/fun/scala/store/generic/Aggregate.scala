@@ -6,6 +6,6 @@ abstract class Aggregate[A](val id: AggregateId[A], val version: Version, privat
   val snapshot: Snapshot[A] = events.foldLeft(initialSnapshot)(replay)
   val state: A = snapshot.state
   def replay(snapshot: Snapshot[A], event: Event[A]): Snapshot[A]
-  def apply(command: Command[A]): Aggregate[A]
-  def &(command: Command[A]): Aggregate[A] = apply(command)
+  def run(command: Command[A]): Aggregate[A]
+  def &(command: Command[A]): Aggregate[A] = run(command)
 }

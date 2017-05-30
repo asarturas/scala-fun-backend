@@ -4,6 +4,7 @@ import scala.collection.mutable
 
 class RuntimeEventStore[A] extends EventStore[A] {
   var streams: mutable.Map[StreamId, (List[Event[A]], Version)] = mutable.Map.empty
+  def allStreamIds: Iterable[StreamId] = streams.keys
   def eventsOf(id: StreamId): Option[(List[Event[A]], Version)] = {
     if (streams.contains(id)) Some(streams(id))
     else None

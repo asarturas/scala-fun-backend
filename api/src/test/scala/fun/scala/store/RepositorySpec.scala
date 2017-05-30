@@ -25,7 +25,7 @@ class RepositorySpec extends FlatSpec with Matchers {
 
     // aggregate id
     case class DoorAggregateId(id: UUID) extends AggregateId[Door] {
-      def toStreamId: StreamId = StreamId("door-" + id.toString)
+      def toStreamId: StreamId = StreamId("door", id.toString)
     }
 
     // aggregate -> define the event replay and command application
@@ -36,7 +36,7 @@ class RepositorySpec extends FlatSpec with Matchers {
         case Locked()   => snapshot.copy(state = snapshot.state.copy(isLocked = true))
         case Unlocked() => snapshot.copy(state = snapshot.state.copy(isLocked = false, knocks = 0))
       }
-      def apply(command: Command[Door]): DoorAggregate = command match {
+      def run(command: Command[Door]): DoorAggregate = command match {
         case Knock() => DoorAggregate(id, version, events :+ Knocked())
         case Lock() => DoorAggregate(id, version, events :+ Locked())
         case Unlock() => DoorAggregate(id, version, events :+ Unlocked())
@@ -48,6 +48,7 @@ class RepositorySpec extends FlatSpec with Matchers {
       val initialState = Door(isLocked = true, knocks = 0)
       val zeroAggregateId = DoorAggregateId(UUID.fromString("00000000-0000-0000-0000-000000000000"))
       def newAggregateId: AggregateId[Door] = DoorAggregateId(UUID.randomUUID)
+      def getAggregateId(streamId: StreamId): AggregateId[Door] = DoorAggregateId(UUID.fromString(streamId.id))
       def getAggregate(id: AggregateId[Door], version: Version, events: List[Event[Door]]): Aggregate[Door] =
         DoorAggregate(id, version, events)
     }
