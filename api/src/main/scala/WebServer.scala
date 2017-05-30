@@ -7,9 +7,6 @@ import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import fun.scala.actors.Messages.{RandomVideo, ReturnRandomVideo}
-import fun.scala.pocket.actors.PocketClient
-import fun.scala.store.video.Video
-//import fun.scala.{PocketAdapter, ReturnRandomVideo, Video, VideoRepository}
 import akka.pattern.ask
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.model.StatusCodes._
@@ -18,15 +15,11 @@ import fun.scala.actors.Messages.CollectVideos
 import fun.scala.actors.{Processor, Sourcer, Storage}
 import fun.scala.processors.UrlProcessor
 import fun.scala.sourcers.{PocketConfig, PocketSourcer}
-//import fun.scala.video.VideoPostProcessor
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.io.StdIn
 
-/**
-  * Created by arturas on 19/05/2017.
-  */
 object WebServer {
 
   val config = ConfigFactory.load().getConfig("scala-fun")
@@ -68,14 +61,6 @@ object WebServer {
     )
     sourcer ! CollectVideos()
 
-//    val videoRepository = system.actorOf(Props[VideoRepository], "videoRepository")
-//    val videoPostProcessor = system.actorOf(VideoPostProcessor.withProps(videoRepository), "videoPostProcessor")
-//    val pocketAdapter = system.actorOf(PocketAdapter.withProps(videoPostProcessor), "pocketAdapter")
-
-    // pocket
-//    val (consumerKey, accessToken) = (config.getString("pocketConsumerKey"), config.getString("pocketAccessToken"))
-//    system.actorOf(PocketClient.withProps(consumerKey, accessToken, pocketAdapter), "pocketClient")
-
     // circe for decoding responses in json
     import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
     import io.circe.generic.auto._
@@ -97,8 +82,8 @@ object WebServer {
 
     println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
     StdIn.readLine() // let it run until user presses return
-//    bindingFuture
-//      .flatMap(_.unbind()) // trigger unbinding from the port
-//      .onComplete(_ => system.terminate()) // and shutdown when done
+    bindingFuture
+      .flatMap(_.unbind()) // trigger unbinding from the port
+      .onComplete(_ => system.terminate()) // and shutdown when done
   }
 }
