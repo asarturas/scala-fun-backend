@@ -18,8 +18,8 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
 
               # create folders for the artifacts
-              mkdir /tmp/artifacts
-              mkdir /tmp/artifacts/lib
+              mkdir /tmp/api-client-js
+              mkdir /tmp/api-client-js/lib
 
               # build
               sbt "apiClientJs/fullOptJS"
@@ -32,29 +32,29 @@ jobs:
 
               # prepare artifacts
               cd api-client-js/src/main/resources
-              sed "s/%%VERSION%%/$(cat "/tmp/version")/" package.template.json > /tmp/artifacts/package.json
-              cp index.js   /tmp/artifacts/index.js
-              cp index.d.ts /tmp/artifacts/index.d.ts
+              sed "s/%%VERSION%%/$(cat "/tmp/version")/" package.template.json > /tmp/api-client-js/package.json
+              cp index.js   /tmp/api-client-js/index.js
+              cp index.d.ts /tmp/api-client-js/index.d.ts
               cd /tmp
-              tar -zcvf artifacts.tar.gz artifacts
+              tar -zcvf api-client-js.tar.gz api-client-js
 
               # invoke npm package build
-              #curl --user ${CIRCLE_API_TOKEN}: \
-              #  --data build_parameters[CIRCLE_JOB]=publish_api_client \
-              #  --data build_parameters[BUILD_NUM_WITH_ARTIFACTS]=${CIRCLE_BUILD_NUM} \
-              #  --data revision=$CIRCLE_SHA1 \
+              curl --user ${CIRCLE_API_TOKEN}: \
+                --data build_parameters[CIRCLE_JOB]=publish_api_client \
+                --data build_parameters[BUILD_NUM_WITH_ARTIFACTS]=${CIRCLE_BUILD_NUM} \
+                --data revision=$CIRCLE_SHA1 \
             fi
       - store_artifacts:
-          path: /tmp/artifacts.tar.gz
-          destination: artifacts.tar.gz
+          path: /tmp/api-client-js.tar.gz
+          destination: api-client-js.tar.gz
       - deploy:
           name: Publish API image to Docker Hub
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              apk add --no-cache docker
-              docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
-              sbt docker:publish
-            fi
+            #if [ "${CIRCLE_BRANCH}" == "master" ]; then
+            #  apk add --no-cache docker
+            #  docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+            #  sbt docker:publish
+            #fi
   publish_api_client:
     working_directory: /
     docker:
@@ -63,4 +63,12 @@ jobs:
       - run:
           name: Get artifacts from original build
           command: |
-            true
+            export GET_ARTIFACT_URL=https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${BUILD_NUM_WITH_ARTIFACTS}/artifacts\?circle-token\=${CIRCLE_API_TOKEN}
+            curl $(curl ${GET_ARTIFACT_URL} | grep -o 'https://[^"]*')\?circle-token\=${CIRCLE_API_TOKEN} > api-client-js.tar.gz
+            tar -xf api-client-js.tar.gz
+      - run:
+          name: Pack the npm package
+          command: cd api-client-js && npm pack
+      - run:
+          name: Publish npm package to repository
+          command: curl -F package=@api-client-js/scala-fun-client-*.tgz https://${FURY_TOKEN}@push.fury.io/asarturas/
