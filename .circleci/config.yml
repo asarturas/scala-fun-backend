@@ -1,0 +1,64 @@
+version: 2
+jobs:
+  build:
+    working_directory: /tmp/build
+    docker:
+      - image: spikerlabs/scala-sbt:scala-2.12.1-sbt-0.13.13
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Run tests
+          command: sbt "api/test"
+      - run:
+          name: Build API Client and store it as an artifact
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+
+              # create folders for the artifacts
+              mkdir /tmp/artifacts
+              mkdir /tmp/artifacts/lib
+
+              # build
+              sbt "apiClientJs/fullOptJS"
+              cd api-client-js
+              cp -f target/scala-2.12/api-client-js-opt.js /tmp/artifacts/lib/index.js
+              cd ..
+
+              # store version
+              sbt -no-colors --info ";project apiClientJs; version" | tail -1 | sed 's/\[info\]\ //' > /tmp/version
+
+              # prepare artifacts
+              cd api-client-js/src/main/resources
+              sed "s/%%VERSION%%/$(cat "/tmp/version")/" package.template.json > /tmp/artifacts/package.json
+              cp index.js   /tmp/artifacts/index.js
+              cp index.d.ts /tmp/artifacts/index.d.ts
+              cd /tmp
+              tar -zcvf artifacts.tar.gz artifacts
+
+              # invoke npm package build
+              #curl --user ${CIRCLE_API_TOKEN}: \
+              #  --data build_parameters[CIRCLE_JOB]=publish_api_client \
+              #  --data build_parameters[BUILD_NUM_WITH_ARTIFACTS]=${CIRCLE_BUILD_NUM} \
+              #  --data revision=$CIRCLE_SHA1 \
+            fi
+      - store_artifacts:
+          path: /tmp/artifacts.tar.gz
+          destination: artifacts.tar.gz
+      - deploy:
+          name: Publish API image to Docker Hub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              apk add --no-cache docker
+              docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+              sbt docker:publish
+            fi
+  publish_api_client:
+    working_directory: /
+    docker:
+      image: node:6
+    steps:
+      - run:
+          name: Get artifacts from original build
+          command: |
+            true
