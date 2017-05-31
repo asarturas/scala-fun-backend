@@ -6,6 +6,7 @@ git.gitTagToVersionNumber := { tag: String =>
   if(tag matches "[0-9]+\\..*") Some(tag)
   else None
 }
+git.useGitDescribe := true
 
 lazy val backend = crossProject.crossType(CrossType.Pure).in(file("backend"))
   .settings(version := "0.0.2")
