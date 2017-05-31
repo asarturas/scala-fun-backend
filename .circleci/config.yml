@@ -56,7 +56,7 @@ jobs:
   publish_api_client:
     working_directory: /
     docker:
-      image: node:6
+      - image: node:6
     steps:
       - run:
           name: Get artifacts from original build
