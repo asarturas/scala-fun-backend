@@ -28,6 +28,7 @@ jobs:
               cd ..
 
               # store version
+              sbt version
               sbt -no-colors --info ";project apiClientJs; version" | tail -1 | sed 's/\[info\]\ //' > /tmp/version
 
               # prepare artifacts
