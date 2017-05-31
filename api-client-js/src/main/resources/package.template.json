@@ -1,6 +1,6 @@
 {
   "name": "scala-fun-client",
-  "version": "0.0.1",
+  "version": "%%VERSION%%",
   "description": "Scala.fun API client library.",
   "licence": "MIT",
   "maintainers": [
