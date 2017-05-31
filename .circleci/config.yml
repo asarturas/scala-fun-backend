@@ -3,7 +3,7 @@ jobs:
   build:
     working_directory: /tmp/build
     docker:
-      - image: spikerlabs/scala-sbt:scala-2.12.1-sbt-0.13.15
+      - image: spikerlabs/scala-sbt:scala-2.12.2-sbt-0.13.13
     steps:
       - checkout
       - run:
