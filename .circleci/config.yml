@@ -76,4 +76,4 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run:
           name: Publish npm package to repository
-          command: npm push $(ls api-client-js/scala-fun-client-*.tgz)
+          command: npm publish $(ls api-client-js/scala-fun-client-*.tgz)
