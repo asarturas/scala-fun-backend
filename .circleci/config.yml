@@ -72,5 +72,8 @@ jobs:
           name: Pack the npm package
           command: cd api-client-js && npm pack
       - run:
+          name: Authenticate with NPM
+          command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - run:
           name: Publish npm package to repository
-          command: curl -F package=@$(ls api-client-js/scala-fun-client-*.tgz) https://${FURY_TOKEN}@push.fury.io/asarturas/
+          command: npm push @$(ls api-client-js/scala-fun-client-*.tgz)
