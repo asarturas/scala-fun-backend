@@ -15,3 +15,6 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 .idea
+
+# Locally built scala-fun-client NPM package
+api-client-js/src/main/resources/localbuild
