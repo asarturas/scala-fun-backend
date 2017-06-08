@@ -52,11 +52,16 @@ jobs:
       - deploy:
           name: Publish API image to Docker Hub
           command: |
-            #if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            #  apk add --no-cache docker
-            #  docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
-            #  sbt docker:publish
-            #fi
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              apk add --no-cache docker
+              docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
+              sbt docker:publish
+#              curl --user ${CIRCLE_API_TOKEN}: \
+#                --data build_parameters[CIRCLE_JOB]=deploy_to_gce \
+#                --data build_parameters[VERSION_TO_DEPLOY]=$(git describe --tags) \
+#                --data revision=$CIRCLE_SHA1 \
+#                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+            fi
   publish_api_client:
     working_directory: /
     docker:
@@ -77,3 +82,23 @@ jobs:
       - run:
           name: Publish npm package to repository
           command: npm publish $(ls api-client-js/scala-fun-client-*.tgz)
+  deploy_to_gce:
+    working_directory: /
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - run:
+          name: Authenticate
+          command: |
+            echo $GCE_SERVICE | base64 --decode --ignore-garbage > ${HOME}/gcloud-service-key.json
+            export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+      - run:
+          name: Select cluster
+          command: |
+            gcloud config set project pairing-buddy
+            gcloud container clusters get-credentials pairing-buddy-2 --zone us-east1-d --project pairing-buddy
+      - run:
+          name: Deploy
+          command: |
+            kubectl set image deployments/scala-fun-backend scala-fun-backend=spikerlabs/scala-fun-backend:$VERSION_TO_DEPLOY
