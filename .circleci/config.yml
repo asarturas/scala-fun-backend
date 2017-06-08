@@ -56,11 +56,11 @@ jobs:
               apk add --no-cache docker
               docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
               sbt docker:publish
-#              curl --user ${CIRCLE_API_TOKEN}: \
-#                --data build_parameters[CIRCLE_JOB]=deploy_to_gce \
-#                --data build_parameters[VERSION_TO_DEPLOY]=$(git describe --tags) \
-#                --data revision=$CIRCLE_SHA1 \
-#                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+              curl --user ${CIRCLE_API_TOKEN}: \
+                --data build_parameters[CIRCLE_JOB]=deploy_to_gce \
+                --data build_parameters[VERSION_TO_DEPLOY]=$(git describe --tags) \
+                --data revision=$CIRCLE_SHA1 \
+                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
             fi
   publish_api_client:
     working_directory: /
@@ -97,7 +97,7 @@ jobs:
           name: Select cluster
           command: |
             gcloud config set project pairing-buddy
-            gcloud container clusters get-credentials pairing-buddy-2 --zone us-east1-d --project pairing-buddy
+            gcloud container clusters get-credentials spikerlabs --zone europe-west2-a --project spikerlabs
       - run:
           name: Deploy
           command: |
