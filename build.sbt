@@ -46,5 +46,13 @@ lazy val api: Project = (project in file("api"))
   .dependsOn(backendJvm)
   .settings(
     name := "api",
+    dockerBaseImage := "openjdk:8-jre-alpine",
+    dockerExposedPorts := Seq(sys.props.getOrElse("API_PORT", 8080).asInstanceOf[Int]),
+    dockerRepository in Docker := Some("spikerlabs"),
+    packageName in Docker := "scala-fun-backend",
+    version in Docker := git.gitDescribedVersion.value.getOrElse("latest"),
     libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
   )
+  .enablePlugins(AshScriptPlugin, DockerPlugin)
+
+onLoad in Global := (Command.process("project api", _: State)) compose (onLoad in Global).value
