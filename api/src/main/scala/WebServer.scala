@@ -18,7 +18,7 @@ import fun.scala.sourcers.{PocketConfig, PocketSourcer}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.io.StdIn
+import scala.util.{ Failure, Success }
 
 object WebServer {
 
@@ -82,12 +82,12 @@ object WebServer {
     val apiHost = config.getString("apiServerHost")
     val apiPort = config.getInt("apiServerPort")
 
-    val bindingFuture = Http().bindAndHandle(route, apiHost, apiPort)
+    Http().bindAndHandle(route, apiHost, apiPort).onComplete {
+      case Success(_) => println(s"Server online at http://${apiHost}:${apiPort}/\n")
+      case Failure(message) =>
+        println(message)
+        system.terminate()
+    }
 
-    println(s"Server online at http://${apiHost}:${apiPort}/\nPress RETURN to stop...")
-    StdIn.readLine() // let it run until user presses return
-    bindingFuture
-      .flatMap(_.unbind()) // trigger unbinding from the port
-      .onComplete(_ => system.terminate()) // and shutdown when done
   }
 }
