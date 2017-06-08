@@ -49,6 +49,7 @@ jobs:
       - store_artifacts:
           path: /tmp/api-client-js.tar.gz
           destination: api-client-js.tar.gz
+      - setup_remote_docker
       - deploy:
           name: Publish API image to Docker Hub
           command: |
