@@ -22,6 +22,6 @@ class Processor(processor: fun.scala.processors.Processor) extends Actor with Ac
       log.info("processor received")
       val result = processor.process(videos)
       val metadata = combinator.combine(result)
-      context.system.actorSelection("user/*") ! StoreVideoMetadata(metadata)
+      context.system.actorSelection("user/storage") ! StoreVideoMetadata(metadata)
   }
 }

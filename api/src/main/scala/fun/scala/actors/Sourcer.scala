@@ -17,6 +17,6 @@ class Sourcer(source: Source, config: SourcerConfig) extends Actor with ActorLog
   def receive: Receive = {
     case CollectVideos() =>
       log.info("sourcer received")
-      context.system.actorSelection("user/*") ! ProcessSourcedVideos(sourcer.collect())
+      context.system.actorSelection("user/url-processor") ! ProcessSourcedVideos(sourcer.collect())
   }
 }
