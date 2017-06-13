@@ -1,6 +1,7 @@
 package fun.scala
 
 import io.circe.Decoder
+import io.circe.Encoder
 import io.circe.generic.semiauto._
 
 import scala.scalajs.js.annotation.{ JSExport, JSExportAll, JSExportTopLevel }
@@ -12,5 +13,6 @@ case class Video(title: String, url: String, likes: Int, plays: Int) {
 }
 
 object Video {
-  implicit val decodeFileData: Decoder[Video] = deriveDecoder[Video]
+  implicit val decodeVideo: Decoder[Video] = deriveDecoder[Video]
+  implicit val encodeVideo: Encoder[Video] = deriveEncoder[Video]
 }
