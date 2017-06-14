@@ -28,4 +28,6 @@ case class SourcedVideoMetadata(
   likes: Option[Int] = None
 )
 
-case class VideoMetadata(video: SourcedVideo, embedUrl: Uri, id: String, plays: Int, likes: Int)
+case class VideoMetadata(video: SourcedVideo, embedUrl: Uri, id: Option[String], plays: Int, likes: Int) {
+  def idSeed: String = id.getOrElse(embedUrl.toString)
+}

@@ -24,7 +24,7 @@ class Combinator {
       VideoMetadata(
         sourced.video,
         sourced.embedUrl.getOrElse(sourced.video.url),
-        sourced.id.getOrElse(""),
+        sourced.id,
         sourced.plays.getOrElse(0),
         sourced.likes.getOrElse(0)
       )
