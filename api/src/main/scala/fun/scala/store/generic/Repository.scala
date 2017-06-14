@@ -3,6 +3,8 @@ package fun.scala.store.generic
 import scala.util.Random
 
 case class Repository[A](private val store: EventStore[A], private val factory: Factory[A]) {
+  def createAs(idSeed: String): Aggregate[A] = factory.getAggregate(id = factory.getAggregateId(AggregateIdString(idSeed)))
+
   def create: Aggregate[A] = factory.getAggregate(id = factory.newAggregateId)
 
   def getById(id: AggregateId[A]): Option[Aggregate[A]] = {

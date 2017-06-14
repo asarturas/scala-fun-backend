@@ -12,6 +12,7 @@ object VideoFactory extends NumericFactory[Video] {
   )
   val zeroAggregateId: AggregateId[Video] = VideoAggregateId(UUID.fromString("00000000-0000-0000-0000-000000000000"))
   def newAggregateId: AggregateId[Video] = VideoAggregateId(UUID.randomUUID)
+  def getAggregateId(idStr: String): AggregateId[Video] = VideoAggregateId(UUID.fromString(idStr))
   def getAggregateId(streamId: StreamId): AggregateId[Video] = VideoAggregateId(UUID.fromString(streamId.id))
   def getAggregate(id: AggregateId[Video], version: Version, events: List[Event[Video]]): Aggregate[Video] =
     VideoAggregate(id, version, events)

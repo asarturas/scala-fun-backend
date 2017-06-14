@@ -24,9 +24,7 @@ class RepositorySpec extends FlatSpec with Matchers {
 
 
     // aggregate id
-    case class DoorAggregateId(id: UUID) extends AggregateId[Door] {
-      def toStreamId: StreamId = StreamId("door", id.toString)
-    }
+    case class DoorAggregateId(doorId: String = "") extends AggregateId[Door]("door", doorId)
 
     // aggregate -> define the event replay and command application
     case class DoorAggregate(override val id: AggregateId[Door], override val version: Version, init: List[Event[Door]])
@@ -46,9 +44,10 @@ class RepositorySpec extends FlatSpec with Matchers {
     // factory
     object DoorFactory extends NumericFactory[Door] {
       val initialState = Door(isLocked = true, knocks = 0)
-      val zeroAggregateId = DoorAggregateId(UUID.fromString("00000000-0000-0000-0000-000000000000"))
-      def newAggregateId: AggregateId[Door] = DoorAggregateId(UUID.randomUUID)
-      def getAggregateId(streamId: StreamId): AggregateId[Door] = DoorAggregateId(UUID.fromString(streamId.id))
+      val zeroAggregateId = DoorAggregateId("00000000-0000-0000-0000-000000000000")
+      def newAggregateId: AggregateId[Door] = DoorAggregateId()
+      def getAggregateId(idStr: String): AggregateId[Door] = DoorAggregateId(idStr)
+      def getAggregateId(streamId: StreamId): AggregateId[Door] = DoorAggregateId(streamId.id)
       def getAggregate(id: AggregateId[Door], version: Version, events: List[Event[Door]]): Aggregate[Door] =
         DoorAggregate(id, version, events)
     }
@@ -59,8 +58,25 @@ class RepositorySpec extends FlatSpec with Matchers {
   val doorMemoryStore = new RuntimeEventStore[Door]()
   val doorRepository = Repository(doorMemoryStore, DoorFactory)
 
+  it should "generate id from seed" in {
+    DoorAggregateId(AggregateIdString("something")) should be (DoorAggregateId(AggregateIdString("something")))
+    DoorAggregateId(AggregateIdString("something else")) should not be DoorAggregateId(AggregateIdString("something"))
+  }
+
+  it should "use passed uuid string representation" in {
+    DoorAggregateId("15fd7a3a-d6e3-37a8-b07f-8b51da64880e").id.toString should be ("15fd7a3a-d6e3-37a8-b07f-8b51da64880e")
+  }
+
+  it should "generate random uuid when passed malformed uuid string representation" in {
+    DoorAggregateId("a").id.toString should not be DoorAggregateId("a").id.toString
+  }
+
+  it should "accept uuid representation without dashes" in {
+    DoorAggregateId("15fd7a3ad6e337a8b07f8b51da64880e").id.toString should be ("15fd7a3a-d6e3-37a8-b07f-8b51da64880e")
+  }
+
   it should "return none when asked for non existing aggregate" in {
-    doorRepository.getById(DoorAggregateId(UUID.randomUUID)) should be(None)
+    doorRepository.getById(DoorAggregateId()) should be(None)
   }
   it should "create initial aggregate" in {
     val newDoor = doorRepository.create

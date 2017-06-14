@@ -70,8 +70,8 @@ object WebServer {
         get {
           implicit val timeout: Timeout = 5.seconds
           val video: Future[fun.scala.Video] = (storage ? ReturnRandomVideo()).map {
-            case RandomVideo(v) =>
-              fun.scala.Video(v.title, v.embedUrl.toString, v.likesOverall, v.playsOverall)
+            case RandomVideo((id, v)) =>
+              fun.scala.Video(id, v.title, v.embedUrl.toString, v.likesOverall, v.playsOverall)
           }
           complete(video)
         }

@@ -18,10 +18,10 @@ class Storage extends Actor with ActorLogging {
     case StoreVideoMetadata(metadata) =>
       log.info("got video metadata")
       log.info(metadata.toString)
-      metadata.foreach(m => runtimeRepository.save(runtimeRepository.create & UpdateMetadata(m)))
+      metadata.foreach(m => runtimeRepository.save(runtimeRepository.createAs(m.embedUrl.toString) & UpdateMetadata(m)))
     case ReturnRandomVideo() =>
       val respondTo = sender()
-      respondTo ! RandomVideo(runtimeRepository.getRandom.map(_.state).get)
+      respondTo ! RandomVideo(runtimeRepository.getRandom.map(v => (v.id.id.toString, v.state)).get)
 
   }
 }

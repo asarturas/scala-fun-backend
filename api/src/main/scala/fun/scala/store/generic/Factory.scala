@@ -5,6 +5,7 @@ trait Factory[A] {
   val initialState: A
   val zeroAggregateId: AggregateId[A]
   def newAggregateId: AggregateId[A]
+  def getAggregateId(idStr: String): AggregateId[A]
   def getAggregateId(streamId: StreamId): AggregateId[A]
   lazy val initialSnapshot: Snapshot[A] = Snapshot[A](zeroAggregateId, initialState)
   def getAggregate(id: AggregateId[A] = zeroAggregateId, version: Version = versionZero, events: List[Event[A]] = Nil): Aggregate[A]

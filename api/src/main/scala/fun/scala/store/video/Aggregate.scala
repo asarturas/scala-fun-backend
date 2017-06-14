@@ -17,16 +17,7 @@ case class Video(likes: Int, plays: Int, metadata: VideoMetadata) {
   def playsOverall: Int = plays + metadata.plays
 }
 
-//object Video {
-//  implicit val decodeUri: Decoder[Uri] = deriveDecoder[Uri]
-//  implicit val decodeSourcedVideo: Decoder[SourcedVideo] = deriveDecoder[SourcedVideo]
-//  implicit val decodeVideoMetadata: Decoder[VideoMetadata] = deriveDecoder[VideoMetadata]
-//  implicit val decodeVideo: Decoder[Video] = deriveDecoder[Video]
-//}
-
-case class VideoAggregateId(id: UUID) extends AggregateId[Video] {
-  def toStreamId: StreamId = StreamId("video", id.toString)
-}
+case class VideoAggregateId(override val id: UUID) extends AggregateId[Video]("video")
 
 case class VideoAggregate(override val id: AggregateId[Video], override val version: Version, init: List[Event[Video]])
   extends Aggregate[Video](id, version, init, VideoFactory.initialSnapshot) {
