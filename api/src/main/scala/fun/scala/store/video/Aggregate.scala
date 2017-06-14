@@ -17,7 +17,7 @@ case class Video(likes: Int, plays: Int, metadata: VideoMetadata) {
   def playsOverall: Int = plays + metadata.plays
 }
 
-case class VideoAggregateId(override val id: UUID) extends AggregateId[Video]("video")
+case class VideoAggregateId(idStr: String = "") extends AggregateId[Video]("video", idStr)
 
 case class VideoAggregate(override val id: AggregateId[Video], override val version: Version, init: List[Event[Video]])
   extends Aggregate[Video](id, version, init, VideoFactory.initialSnapshot) {
