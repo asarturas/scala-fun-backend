@@ -5,7 +5,7 @@ import fun.scala.Service.{Vimeo, Youtube}
 import fun.scala.{Service, SourcedVideo, SourcedVideoMetadata}
 import monix.eval.Task
 
-class IdProcessor extends Processor {
+class VideoIdProcessor extends Processor {
   def process(collectedVideos: List[SourcedVideo]): List[Task[Option[SourcedVideoMetadata]]] = {
     collectedVideos.map {
       case video @ SourcedVideo(url, title, service, source) =>

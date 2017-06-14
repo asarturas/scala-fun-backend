@@ -10,14 +10,14 @@ import org.scalatest._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class IdProcessorSpec extends FlatSpec with Matchers {
+class VideoIdProcessorSpec extends FlatSpec with Matchers {
   it should "extract video id from youtube url" in {
-    val processor = new IdProcessor()
+    val processor = new VideoIdProcessor()
     processor.videoId(Youtube, Uri.parse("https://www.youtube.com/watch?v=HXIJcIivMH&list=2435675432")) should
       be(Some("HXIJcIivMH"))
   }
   it should "extract video id from vimeo url" in {
-    val processor = new IdProcessor()
+    val processor = new VideoIdProcessor()
     processor.videoId(Vimeo, Uri.parse("https://vimeo.com/217847572")) should be(Some("217847572"))
   }
   it should "return none for misformatted youtube or vimeo url or url from unknown service" in {

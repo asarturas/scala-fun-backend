@@ -13,12 +13,12 @@ import akka.http.scaladsl.model.StatusCodes._
 import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 import fun.scala.actors.Messages.CollectVideos
 import fun.scala.actors.{Processor, Sourcer, Storage}
-import fun.scala.processors.UrlProcessor
+import fun.scala.processors.{UrlProcessor, VideoIdProcessor}
 import fun.scala.sourcers.{PocketConfig, PocketSourcer}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.{ Failure, Success }
+import scala.util.{Failure, Success}
 
 object WebServer {
 
@@ -52,8 +52,8 @@ object WebServer {
       "pocket-sourcer"
     )
     system.actorOf(
-      Processor.create(new UrlProcessor()),
-      "url-processor"
+      Processor.create(List(new UrlProcessor(), new VideoIdProcessor())),
+      "processor"
     )
     val storage = system.actorOf(
       Props[Storage],

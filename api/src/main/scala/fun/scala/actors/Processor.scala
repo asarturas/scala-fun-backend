@@ -5,10 +5,10 @@ import fun.scala.actors.Messages.{ProcessSourcedVideos, StoreVideoMetadata}
 import fun.scala.processors.Combinator
 
 object Processor {
-  def create(processor: fun.scala.processors.Processor): Props = Props(new Processor(processor))
+  def create(processors: List[fun.scala.processors.Processor]): Props = Props(new Processor(processors))
 }
 
-class Processor(processor: fun.scala.processors.Processor) extends Actor with ActorLogging {
+class Processor(processors: List[fun.scala.processors.Processor]) extends Actor with ActorLogging {
 
   val combinator = new Combinator()
 
@@ -20,7 +20,7 @@ class Processor(processor: fun.scala.processors.Processor) extends Actor with Ac
   def receive: Receive = {
     case ProcessSourcedVideos(videos) =>
       log.info("processor received")
-      val result = processor.process(videos)
+      val result = processors.map(_.process(videos)).fold(List())(_ ++ _)
       val metadata = combinator.combine(result)
       context.system.actorSelection("user/storage") ! StoreVideoMetadata(metadata)
   }
