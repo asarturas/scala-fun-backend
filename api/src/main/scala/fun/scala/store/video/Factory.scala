@@ -8,7 +8,7 @@ import fun.scala.store.generic._
 
 object VideoFactory extends NumericFactory[Video] {
   val initialState: Video = Video(0, 0,
-    VideoMetadata(SourcedVideo(Uri.parse(""), "", Service.Unknown, Source.Unknown), Uri.parse(""), 0, 0)
+    VideoMetadata(SourcedVideo(Uri.parse(""), "", Service.Unknown, Source.Unknown), Uri.parse(""), "", 0, 0)
   )
   val zeroAggregateId: AggregateId[Video] = VideoAggregateId(UUID.fromString("00000000-0000-0000-0000-000000000000"))
   def newAggregateId: AggregateId[Video] = VideoAggregateId(UUID.randomUUID)

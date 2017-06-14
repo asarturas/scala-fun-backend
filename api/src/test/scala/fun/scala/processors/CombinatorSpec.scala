@@ -23,8 +23,8 @@ class CombinatorSpec extends FlatSpec with Matchers {
     )
     new Combinator().combine(processTasks).toSet should be(
       Set(
-        VideoMetadata(video1, embedUrl = Uri.parse("http://scala.fun/embed"), likes = 5, plays = 7),
-        VideoMetadata(video2, embedUrl = Uri.parse("http://asm.lt/another-embed"), likes = 2, plays = 0)
+        VideoMetadata(video1, embedUrl = Uri.parse("http://scala.fun/embed"), "", likes = 5, plays = 7),
+        VideoMetadata(video2, embedUrl = Uri.parse("http://asm.lt/another-embed"), "", likes = 2, plays = 0)
       )
     )
   }

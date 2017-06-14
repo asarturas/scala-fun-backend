@@ -11,7 +11,7 @@ class UrlProcessor extends Processor {
       case video @ SourcedVideo(url, title, service, source) =>
         Task.eval(
           embedUrl(service, url).map { embedUrl =>
-            SourcedVideoMetadata(video, Some(embedUrl), plays = None, likes = None)
+            SourcedVideoMetadata(video, Some(embedUrl), id = None, plays = None, likes = None)
           }
         )
     }

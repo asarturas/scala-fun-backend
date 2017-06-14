@@ -23,8 +23,9 @@ case class SourcedVideo(url: Uri, title: String, service: Service, source: Sourc
 case class SourcedVideoMetadata(
   video: SourcedVideo,
   embedUrl: Option[Uri] = None,
+  id: Option[String] = None,
   plays: Option[Int] = None,
   likes: Option[Int] = None
 )
 
-case class VideoMetadata(video: SourcedVideo, embedUrl: Uri, plays: Int, likes: Int)
+case class VideoMetadata(video: SourcedVideo, embedUrl: Uri, id: String, plays: Int, likes: Int)

@@ -15,6 +15,7 @@ class Combinator {
         SourcedVideoMetadata(
           sourcedVideo,
           v1.embedUrl.orElse(v2.embedUrl),
+          v1.id.orElse(v2.id),
           sumOptions(v1.plays, v2.plays),
           sumOptions(v1.likes, v2.likes)
         )
@@ -23,6 +24,7 @@ class Combinator {
       VideoMetadata(
         sourced.video,
         sourced.embedUrl.getOrElse(sourced.video.url),
+        sourced.id.getOrElse(""),
         sourced.plays.getOrElse(0),
         sourced.likes.getOrElse(0)
       )
