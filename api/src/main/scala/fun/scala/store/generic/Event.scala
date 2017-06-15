@@ -1,3 +1,8 @@
 package fun.scala.store.generic
 
-trait Event[A]
+import io.circe.Json
+
+trait Event[A] {
+  def typeName: String
+  def asJson: Json = Json.obj()
+}

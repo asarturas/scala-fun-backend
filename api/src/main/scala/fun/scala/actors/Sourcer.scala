@@ -1,8 +1,8 @@
 package fun.scala.actors
 
 import akka.actor.{Actor, ActorLogging, Props}
-import fun.scala.Source
 import fun.scala.actors.Messages.{CollectVideos, ProcessSourcedVideos}
+import fun.scala.data.Source
 import fun.scala.sourcers.{PocketConfig, PocketSourcer, SourcerConfig}
 import fun.scala.sourcers.PocketSourcer.Pocket
 

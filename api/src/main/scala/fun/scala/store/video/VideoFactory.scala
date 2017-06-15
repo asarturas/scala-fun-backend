@@ -3,7 +3,7 @@ package fun.scala.store.video
 import java.util.UUID
 
 import com.netaporter.uri.Uri
-import fun.scala.{Service, Source, SourcedVideo, VideoMetadata}
+import fun.scala.data.{Service, Source, SourcedVideo, VideoMetadata}
 import fun.scala.store.generic._
 
 object VideoFactory extends NumericFactory[Video] {

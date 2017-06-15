@@ -1,23 +1,8 @@
 package fun.scala.store.video
 
-import java.util.UUID
-
-import com.netaporter.uri.Uri
-import io.circe.Decoder
-import io.circe.generic.semiauto._
-import fun.scala.{SourcedVideo, VideoMetadata}
 import fun.scala.store.generic._
 import fun.scala.store.video.Events._
 import fun.scala.store.video.Commands._
-
-case class Video(likes: Int, plays: Int, metadata: VideoMetadata) {
-  def embedUrl: Uri = metadata.embedUrl
-  def title: String = metadata.video.title
-  def likesOverall: Int = likes + metadata.likes
-  def playsOverall: Int = plays + metadata.plays
-}
-
-case class VideoAggregateId(idStr: String = "") extends AggregateId[Video]("video", idStr)
 
 case class VideoAggregate(override val id: AggregateId[Video], override val version: Version, init: List[Event[Video]])
   extends Aggregate[Video](id, version, init, VideoFactory.initialSnapshot) {

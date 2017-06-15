@@ -1,6 +1,6 @@
 package fun.scala.processors
 
-import fun.scala.{SourcedVideoMetadata, VideoMetadata}
+import fun.scala.data.{SourcedVideoMetadata, VideoMetadata}
 import monix.eval.Task
 
 import scala.concurrent.Await

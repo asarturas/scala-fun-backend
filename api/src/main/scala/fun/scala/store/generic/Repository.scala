@@ -9,7 +9,8 @@ case class Repository[A](private val store: EventStore[A], private val factory: 
 
   def getById(id: AggregateId[A]): Option[Aggregate[A]] = {
     store.eventsOf(id.toStreamId) match {
-      case Some((events, version)) => Some(factory.getAggregate(id, version, events))
+      case Some((events, version)) =>
+        Some(factory.getAggregate(id, version, events))
       case None => None
     }
   }

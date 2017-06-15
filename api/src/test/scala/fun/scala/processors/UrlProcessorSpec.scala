@@ -1,9 +1,9 @@
 package fun.scala.processors
 
 import com.netaporter.uri.Uri
-import fun.scala.Service.{Vimeo, Youtube}
 import fun.scala.sourcers.PocketSourcer.Pocket
-import fun.scala.{SourcedVideo, SourcedVideoMetadata}
+import fun.scala.data.{SourcedVideo, SourcedVideoMetadata}
+import fun.scala.data.Service.{Vimeo, Youtube}
 import monix.eval.Task
 import org.scalatest._
 

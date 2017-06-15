@@ -1,6 +1,6 @@
 package fun.scala.processors
 
-import fun.scala.{SourcedVideo, SourcedVideoMetadata}
+import fun.scala.data.{SourcedVideo, SourcedVideoMetadata}
 import monix.eval.Task
 
 trait Processor {

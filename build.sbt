@@ -21,7 +21,8 @@ lazy val backend = crossProject.crossType(CrossType.Pure).in(file("backend"))
       "io.circe"          %% "circe-generic" % "0.7.0",
       "io.circe"          %% "circe-parser" % "0.7.0",
       "io.taig"           %% "communicator" % "3.2.2",
-      "io.lemonlabs"      %% "scala-uri" % "0.4.16"
+      "io.lemonlabs"      %% "scala-uri" % "0.4.16",
+      "com.geteventstore" %% "eventstore-client" % "4.1.1"
     )
   )
   .jsSettings(

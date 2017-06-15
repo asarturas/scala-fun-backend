@@ -1,7 +1,7 @@
 package fun.scala.processors
 
 import com.netaporter.uri.Uri
-import fun.scala.{Service, Source, SourcedVideo, SourcedVideoMetadata, VideoMetadata}
+import fun.scala.data.{Service, Source, SourcedVideo, SourcedVideoMetadata, VideoMetadata}
 import monix.eval.Task
 import org.scalatest.{FlatSpec, Matchers}
 

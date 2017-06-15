@@ -1,7 +1,10 @@
 package fun.scala.store.video
 
-import fun.scala.VideoMetadata
+import fun.scala.data.VideoMetadata
 import fun.scala.store.generic.Command
+import io.circe._
+import io.circe.generic.semiauto._
+
 
 object Commands {
   case class UpdateMetadata(metadata: VideoMetadata) extends Command[Video]

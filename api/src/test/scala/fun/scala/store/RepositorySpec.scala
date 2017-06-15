@@ -18,9 +18,15 @@ class RepositorySpec extends FlatSpec with Matchers {
     case class Unlock() extends Command[Door]
 
     // events
-    case class Knocked() extends Event[Door]
-    case class Locked() extends Event[Door]
-    case class Unlocked() extends Event[Door]
+    case class Knocked() extends Event[Door] {
+      val typeName = "knocked"
+    }
+    case class Locked() extends Event[Door] {
+      val typeName = "locked"
+    }
+    case class Unlocked() extends Event[Door] {
+      val typeName = "unlocked"
+    }
 
 
     // aggregate id

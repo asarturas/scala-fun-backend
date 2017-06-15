@@ -1,8 +1,8 @@
 package fun.scala.processors
 
 import com.netaporter.uri.Uri
-import fun.scala.Service.{Vimeo, Youtube}
-import fun.scala.{Service, SourcedVideo, SourcedVideoMetadata}
+import fun.scala.data.{Service, SourcedVideo, SourcedVideoMetadata}
+import fun.scala.data.Service.{Vimeo, Youtube}
 import monix.eval.Task
 
 class VideoIdProcessor extends Processor {

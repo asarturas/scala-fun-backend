@@ -7,7 +7,7 @@ import okhttp3.{MediaType, OkHttpClient, RequestBody}
 import io.circe.parser.decode
 import io.circe.Decoder
 import io.circe.generic.semiauto._
-import fun.scala.{Service, Source, SourcedVideo}
+import fun.scala.data.{Service, Source, SourcedVideo}
 import fun.scala.sourcers.PocketSourcer.{Collection, Item, Pocket}
 
 import scala.concurrent.Await

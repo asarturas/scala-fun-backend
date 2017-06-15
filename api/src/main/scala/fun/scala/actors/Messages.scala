@@ -1,8 +1,7 @@
 package fun.scala.actors
 
-import fun.scala.store.generic.AggregateId
-import fun.scala.store.video.{Video, VideoAggregateId}
-import fun.scala.{SourcedVideo, SourcedVideoMetadata, VideoMetadata}
+import fun.scala.data.{SourcedVideo, SourcedVideoMetadata, VideoMetadata}
+import fun.scala.store.video.{Video}
 import monix.eval.Task
 
 object Messages {
