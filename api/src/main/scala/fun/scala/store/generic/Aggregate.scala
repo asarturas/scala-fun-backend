@@ -1,11 +1,31 @@
 package fun.scala.store.generic
 
-abstract class Aggregate[A](val id: AggregateId[A], val version: Version, private val init: List[Event[A]],
-                            private val initialSnapshot: Snapshot[A]) {
-  val events: List[Event[A]] = init
-  val snapshot: Snapshot[A] = events.foldLeft(initialSnapshot)(replay)
+case class Aggregate[A](id: AggregateId[A], version: Version, snapshot: Snapshot[A],
+                        private val commandHandler: Aggregate.CommandHandler[A],
+                        private val eventHandler: Aggregate.EventHandler[A])
+                       (private val repository: Repository[A]) {
   val state: A = snapshot.state
-  def replay(snapshot: Snapshot[A], event: Event[A]): Snapshot[A]
-  def run(command: Command[A]): Aggregate[A]
+  def run(command: Command[A]): Aggregate[A] = {
+    val (effects, events) = commandHandler(snapshot, command)
+    val versionAfterUpdate =
+      events.foldLeft(Option(version))(
+        (versionSoFar, event) => versionSoFar.flatMap(
+          v => repository.save(id, event, v)
+        )
+      )
+    if (versionAfterUpdate.nonEmpty) {
+      effects()
+      this.copy(version = versionAfterUpdate.get, snapshot = events.foldLeft(this.snapshot)(eventHandler))(this.repository)
+    } else {
+      this
+    }
+  }
   def &(command: Command[A]): Aggregate[A] = run(command)
+}
+
+object Aggregate {
+  type Effect = () => Unit
+  val noEffect: Effect = () => ()
+  type CommandHandler[A] = (Snapshot[A], Command[A]) => (Effect, List[Event[A]])
+  type EventHandler[A] = (Snapshot[A], Event[A]) => Snapshot[A]
 }

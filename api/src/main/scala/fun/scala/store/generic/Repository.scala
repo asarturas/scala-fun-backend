@@ -3,14 +3,14 @@ package fun.scala.store.generic
 import scala.util.Random
 
 case class Repository[A](private val store: EventStore[A], private val factory: Factory[A]) {
-  def createAs(idSeed: String): Aggregate[A] = factory.getAggregate(id = factory.getAggregateId(AggregateIdString(idSeed)))
+  def createAs(idSeed: String): Aggregate[A] = factory.getAggregate(id = factory.getAggregateId(AggregateIdString(idSeed)))(this)
 
-  def create: Aggregate[A] = factory.getAggregate(id = factory.newAggregateId)
+  def create: Aggregate[A] = factory.getAggregate(id = factory.newAggregateId)(this)
 
   def getById(id: AggregateId[A]): Option[Aggregate[A]] = {
     store.eventsOf(id.toStreamId) match {
       case Some((events, version)) =>
-        Some(factory.getAggregate(id, version, events))
+        Some(factory.getAggregate(id, version, events)(this))
       case None => None
     }
   }
@@ -21,12 +21,11 @@ case class Repository[A](private val store: EventStore[A], private val factory: 
     val streamIds = store.allStreamIds.toList
     getByStreamId(streamIds(Random.nextInt(streamIds.size)))
   }
-  def save(aggregate: Aggregate[A]): Aggregate[A] = {
-    val persistedVersion = persist(aggregate.id.toStreamId, aggregate.version, aggregate.events)
-    if (persistedVersion == aggregate.version) {
-      aggregate
+  def save(id: AggregateId[A], event: Event[A], expected: Version): Option[Version] = {
+    if (!store.matchesVersion(id.toStreamId, expected)) {
+      None
     } else {
-      factory.getAggregate(aggregate.id, persistedVersion, aggregate.events)
+      store.appendEventTo(id.toStreamId, event)
     }
   }
 

@@ -28,6 +28,14 @@ class RuntimeEventStore[A] extends EventStore[A] {
       false
     }
   }
+  def appendEventTo(id: StreamId, event: Event[A]): Option[Version] = {
+    if (streams.contains(id)) {
+      streams(id) = (streams(id)._1 :+ event, streams(id)._2.next)
+      Some(streams(id)._2)
+    } else {
+      None
+    }
+  }
   def matchesVersion(id: StreamId, version: Version): Boolean = {
     streams.contains(id) && streams(id)._2 == version
   }
