@@ -18,7 +18,7 @@ sbt run
 
 ## Structural components (high level description)
 
-### API
+### API Project (api)
 
 This contains API related (backend) stuff.
 At the moment it contains all the sourcing and processing as well as storage.
@@ -45,3 +45,12 @@ Stores feeds of events in the storage:
 **RuntimeStorage** is non persistent in memory store;
 
 **GetEventStore** persistent event database from Gregg Young.
+
+### API Client JS Project (api-client-js)
+
+Contains API client, written in Scala.js
+It is transpiled into JS and distributed in NPM as suggested API client implementation.
+
+### Backend Project (backend)
+
+Contains data structures, which are shared between API and API Client JS.
