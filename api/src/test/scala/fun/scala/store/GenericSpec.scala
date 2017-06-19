@@ -81,10 +81,12 @@ class GenericSpec extends WordSpec with Matchers {
     }
     "updates repository as soon as receives new command" in {
       val newDoor = doorRepository.create
-      val updatedDoor = newDoor & Unlock()
       val doorFromRepository = doorRepository.getById(newDoor.id)
-      doorFromRepository.nonEmpty should be(true)
-//      doorFromRepository.get.events should be(updatedDoor.events)
+      doorFromRepository.isEmpty should be(true)
+      val updatedDoor = newDoor & Unlock()
+      val anotherDoorFromRepository = doorRepository.getById(updatedDoor.id)
+      anotherDoorFromRepository.nonEmpty should be(true)
+      anotherDoorFromRepository.get.state should be(updatedDoor.state)
     }
   }
 
@@ -96,11 +98,6 @@ class GenericSpec extends WordSpec with Matchers {
       val newDoor = doorRepository.create
       newDoor.state should be(factory.initialState)
     }
-    "store initial aggregate" in {
-      val newDoor = doorRepository.create
-//      val savedDoor = doorRepository.save(newDoor)
-//      doorMemoryStore.streams should be(Map(savedDoor.id.toStreamId -> (savedDoor.events, savedDoor.version)))
-    }
     "apply commands to the aggregate" in { // knock, knock, knock, unlock, knock, lock
       val closedDoor = doorRepository.create & Knock() & Knock() & Knock()
       closedDoor.state should be(Door(isLocked = true, knocks = 3))
@@ -111,19 +108,14 @@ class GenericSpec extends WordSpec with Matchers {
     }
     "store events in event store" in {
       val door = doorRepository.create & Knock() & Unlock() & Knock() & Knock() & Lock()
-//      val savedDoor = doorRepository.save(door)
-//      doorMemoryStore.streams(savedDoor.id.toStreamId) should be((savedDoor.events, savedDoor.version))
-//      doorRepository.getById(savedDoor.id).contains(savedDoor)
+      doorRepository.getById(door.id).contains(door)
     }
     "append new events to already saved aggregate" in {
       val door = doorRepository.create & Knock() & Knock()
-//      val savedDoor = doorRepository.save(door)
-//      val existing = doorRepository.getById(savedDoor.id).get
-//      existing.id should be(savedDoor.id)
-//      val updated = existing & Knock() & Knock()
-//      val savedUpdated = doorRepository.save(updated)
-//      savedUpdated.id should be(savedDoor.id)
-//      savedUpdated.events should be(savedDoor.events :+ Knocked() :+ Knocked())
+      val existing = doorRepository.getById(door.id).get
+      existing.id should be(door.id)
+      val updated = existing & Knock() & Knock()
+      updated.id should be(door.id)
     }
   }
 

@@ -22,10 +22,15 @@ case class Repository[A](private val store: EventStore[A], private val factory: 
     getByStreamId(streamIds(Random.nextInt(streamIds.size)))
   }
   def save(id: AggregateId[A], event: Event[A], expected: Version): Option[Version] = {
-    if (!store.matchesVersion(id.toStreamId, expected)) {
-      None
+    if (!store.streamExists(id.toStreamId)) {
+      store.createStream(id.toStreamId, expected, List(event))
+      store.getVersion(id.toStreamId)
     } else {
-      store.appendEventTo(id.toStreamId, event)
+      if (!store.matchesVersion(id.toStreamId, expected)) {
+        None
+      } else {
+        store.appendEventTo(id.toStreamId, event)
+      }
     }
   }
 

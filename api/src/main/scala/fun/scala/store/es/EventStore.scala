@@ -98,12 +98,6 @@ class EventStore extends fun.scala.store.generic.EventStore[Video] {
     getVersion(id)
   }
 
-  def matchesVersion(id: StreamId, version: Version): Boolean = {
-    val stream = EventStream.Id(id.toString)
-    val storedVersion = getVersion(id)
-    storedVersion.isEmpty || storedVersion.get == version
-  }
-
   def getVersion(id: StreamId): Option[Version] = {
     val stream = EventStream.Id(id.toString)
     try {

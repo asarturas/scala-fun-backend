@@ -36,7 +36,9 @@ class RuntimeEventStore[A] extends EventStore[A] {
       None
     }
   }
-  def matchesVersion(id: StreamId, version: Version): Boolean = {
-    streams.contains(id) && streams(id)._2 == version
+
+  def getVersion(id: StreamId): Option[Version] = {
+    if (streams.contains(id)) Some(streams(id)._2)
+    else None
   }
 }
