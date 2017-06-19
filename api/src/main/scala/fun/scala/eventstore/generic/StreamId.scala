@@ -1,4 +1,4 @@
-package fun.scala.store.generic
+package fun.scala.eventstore.generic
 
 case class StreamId(prefix: String, id: String) {
   override def toString: String = prefix + "-" + id

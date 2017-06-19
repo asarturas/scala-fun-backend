@@ -1,7 +1,7 @@
 package fun.scala.actors
 
 import fun.scala.data.{SourcedVideo, SourcedVideoMetadata, VideoMetadata}
-import fun.scala.store.video.{Video}
+import fun.scala.eventstore.video.{Video}
 import monix.eval.Task
 
 object Messages {

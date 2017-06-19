@@ -1,10 +1,10 @@
-package fun.scala.store.video
+package fun.scala.eventstore.video
 
 import com.netaporter.uri.Uri
 import fun.scala.data.{Service, Source, SourcedVideo, VideoMetadata}
-import fun.scala.store.generic._
-import fun.scala.store.video.Events._
-import fun.scala.store.video.Commands._
+import fun.scala.eventstore.generic._
+import fun.scala.eventstore.video.Events._
+import fun.scala.eventstore.video.Commands._
 
 object VideoAggregate {
   val commandHandler: Aggregate.CommandHandler[Video] = (snapshot, command) => command match {

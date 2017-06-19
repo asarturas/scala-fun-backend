@@ -1,6 +1,6 @@
-package fun.scala.store
+package fun.scala.eventstore
 
-import fun.scala.store.generic.StreamId
+import fun.scala.eventstore.generic.StreamId
 import org.scalatest.{FlatSpec, Matchers}
 
 class StreamIdSpec extends FlatSpec with Matchers {

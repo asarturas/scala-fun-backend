@@ -1,8 +1,9 @@
-package fun.scala.store
+package fun.scala.eventstore
 
 import java.util.UUID
 
-import fun.scala.store.generic._
+import fun.scala.eventstore.generic._
+import fun.scala.eventstore.storage.RuntimeStorage
 import org.scalatest.{Matchers, WordSpec}
 
 class GenericSpec extends WordSpec with Matchers {
@@ -51,7 +52,7 @@ class GenericSpec extends WordSpec with Matchers {
       eventHandler
     )
 
-    val doorMemoryStore = new RuntimeEventStore[Door]()
+    val doorMemoryStore = new RuntimeStorage[Door]()
     val doorRepository = Repository[Door](doorMemoryStore, factory)
 
   }

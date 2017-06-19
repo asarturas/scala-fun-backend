@@ -1,4 +1,4 @@
-package fun.scala.store.generic
+package fun.scala.eventstore.generic
 
 case class Factory[A](initialState: A, zeroAggregateId: AggregateId[A], aggregateId: (String) => AggregateId[A], commandHandler: Aggregate.CommandHandler[A], eventHandler: Aggregate.EventHandler[A]) {
   val versionZero: Version = NumericVersion()

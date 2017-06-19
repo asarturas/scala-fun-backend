@@ -1,6 +1,6 @@
-package fun.scala.store.generic
+package fun.scala.eventstore.generic
 
-trait EventStore[A] {
+trait Storage[A] {
   def allStreamIds: Iterable[StreamId]
   def eventsOf(id: StreamId): Option[(List[Event[A]], Version)]
   def createStream(id: StreamId, version: Version, events: List[Event[A]]): Boolean

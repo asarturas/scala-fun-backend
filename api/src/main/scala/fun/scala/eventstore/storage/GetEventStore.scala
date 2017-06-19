@@ -1,4 +1,4 @@
-package fun.scala.store.es
+package fun.scala.eventstore.storage
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Source
@@ -7,14 +7,14 @@ import eventstore.TransactionActor.{Commit, GetTransactionId, Start, Write}
 import eventstore.tcp.ConnectionActor
 import eventstore.{EventData, EventStoreExtension, EventStream, ReadStreamEvents, ReadStreamEventsCompleted, TransactionActor, TransactionStart, WriteEvents, WriteEventsCompleted}
 import io.circe.parser.decode
-import fun.scala.store.generic.{Event, NumericVersion, StreamId, Version}
-import fun.scala.store.video.Events.UpdatedMetadata
-import fun.scala.store.video.Video
+import fun.scala.eventstore.generic.{Event, NumericVersion, StreamId, Version}
+import fun.scala.eventstore.video.Events.UpdatedMetadata
+import fun.scala.eventstore.video.Video
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
-class EventStore extends fun.scala.store.generic.EventStore[Video] {
+class GetEventStore extends fun.scala.eventstore.generic.Storage[Video] {
 
   implicit val system = ActorSystem()
   import system.dispatcher

@@ -1,7 +1,7 @@
-package fun.scala.store.video
+package fun.scala.eventstore.video
 
 import fun.scala.data.VideoMetadata
-import fun.scala.store.generic.Command
+import fun.scala.eventstore.generic.Command
 import io.circe._
 import io.circe.generic.semiauto._
 

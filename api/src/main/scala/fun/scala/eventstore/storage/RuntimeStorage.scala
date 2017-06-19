@@ -1,8 +1,10 @@
-package fun.scala.store.generic
+package fun.scala.eventstore.storage
+
+import fun.scala.eventstore.generic.{Event, Storage, StreamId, Version}
 
 import scala.collection.mutable
 
-class RuntimeEventStore[A] extends EventStore[A] {
+class RuntimeStorage[A] extends Storage[A] {
   var streams: mutable.Map[StreamId, (List[Event[A]], Version)] = mutable.Map.empty
   def allStreamIds: Iterable[StreamId] = streams.keys
   def eventsOf(id: StreamId): Option[(List[Event[A]], Version)] = {

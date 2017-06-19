@@ -1,4 +1,4 @@
-package fun.scala.store.generic
+package fun.scala.eventstore.generic
 
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package fun.scala.store.generic
+package fun.scala.eventstore.generic
 
 case class Aggregate[A](id: AggregateId[A], version: Version, snapshot: Snapshot[A],
                         private val commandHandler: Aggregate.CommandHandler[A],

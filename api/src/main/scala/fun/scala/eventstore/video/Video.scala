@@ -1,4 +1,4 @@
-package fun.scala.store.video
+package fun.scala.eventstore.video
 
 import com.netaporter.uri.Uri
 import fun.scala.data.VideoMetadata

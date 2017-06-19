@@ -1,7 +1,7 @@
-package fun.scala.store.video
+package fun.scala.eventstore.video
 
 import fun.scala.data.VideoMetadata
-import fun.scala.store.generic.Event
+import fun.scala.eventstore.generic.Event
 import io.circe.Decoder.Result
 import io.circe.{Decoder, Encoder, HCursor, Json}
 

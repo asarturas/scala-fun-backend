@@ -1,5 +1,5 @@
-package fun.scala.store.video
+package fun.scala.eventstore.video
 
-import fun.scala.store.generic.AggregateId
+import fun.scala.eventstore.generic.AggregateId
 
 case class VideoAggregateId(idStr: String = "") extends AggregateId[Video]("video", idStr)

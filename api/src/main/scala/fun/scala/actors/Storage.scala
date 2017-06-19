@@ -2,10 +2,10 @@ package fun.scala.actors
 
 import akka.actor.{Actor, ActorLogging}
 import fun.scala.actors.Messages.{RandomVideo, ReturnRandomVideo, StoreVideoMetadata}
-import fun.scala.store.es.EventStore
-import fun.scala.store.generic.{AggregateIdString, Repository}
-import fun.scala.store.video.Commands.UpdateMetadata
-import fun.scala.store.video.{Video, VideoAggregate, VideoAggregateId}
+import fun.scala.eventstore.storage.GetEventStore
+import fun.scala.eventstore.generic.{AggregateIdString, Repository}
+import fun.scala.eventstore.video.Commands.UpdateMetadata
+import fun.scala.eventstore.video.{Video, VideoAggregate, VideoAggregateId}
 
 object Storage {
 
@@ -14,7 +14,7 @@ object Storage {
 class Storage extends Actor with ActorLogging {
 
 //  val runtimeRepository = new Repository[Video](new RuntimeEventStore(), VideoFactory)
-  val runtimeRepository = new Repository[Video](new EventStore(), VideoAggregate.factory)
+  val runtimeRepository = new Repository[Video](new GetEventStore(), VideoAggregate.factory)
 
   def receive: Receive = {
     case StoreVideoMetadata(metadata) =>
