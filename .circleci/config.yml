@@ -102,4 +102,5 @@ jobs:
       - run:
           name: Deploy
           command: |
+            gcloud components install kubectl
             kubectl set image deployments/scala-fun-backend scala-fun-backend=spikerlabs/scala-fun-backend:$VERSION_TO_DEPLOY
