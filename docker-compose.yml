@@ -5,3 +5,6 @@ services:
     ports:
       - "2113:2113"
       - "1113:1113"
+    environment:
+      - EVENTSTORE_RUN_PROJECTIONS=System
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=True
