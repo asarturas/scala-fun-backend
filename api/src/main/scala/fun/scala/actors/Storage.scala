@@ -22,7 +22,7 @@ class Storage extends Actor with ActorLogging {
       metadata.foreach { m =>
         val id = VideoAggregateId(AggregateIdString(m.idSeed))
         val video = runtimeRepository.getById(id).getOrElse(runtimeRepository.createAs(m.idSeed))
-        video & UpdateMetadata(m)
+        if (video.state.metadata != m) video & UpdateMetadata(m)
       }
     case ReturnRandomVideo() =>
       val respondTo = sender()
