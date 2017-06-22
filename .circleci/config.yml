@@ -1,4 +1,22 @@
 version: 2
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - publish_api_client
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - deploy_to_gce
+          requires:
+            - build
+            - publish_api_client
+          filters:
+            branches:
+              only: master
 jobs:
   build:
     working_directory: /tmp/build
@@ -39,12 +57,12 @@ jobs:
               cd /tmp
               tar -zcvf api-client-js.tar.gz api-client-js
 
-              # invoke npm package build
-              curl --user ${CIRCLE_API_TOKEN}: \
-                --data build_parameters[CIRCLE_JOB]=publish_api_client \
-                --data build_parameters[BUILD_NUM_WITH_ARTIFACTS]=${CIRCLE_BUILD_NUM} \
-                --data revision=$CIRCLE_SHA1 \
-                https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}
+#              # invoke npm package build
+#              curl --user ${CIRCLE_API_TOKEN}: \
+#                --data build_parameters[CIRCLE_JOB]=publish_api_client \
+#                --data build_parameters[BUILD_NUM_WITH_ARTIFACTS]=${CIRCLE_BUILD_NUM} \
+#                --data revision=$CIRCLE_SHA1 \
+#                https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/tree/${CIRCLE_BRANCH}
             fi
       - store_artifacts:
           path: /tmp/api-client-js.tar.gz
@@ -57,11 +75,11 @@ jobs:
               apk add --no-cache docker
               docker login -u ${DOCKER_LOGIN} -p ${DOCKER_PASSWORD}
               sbt docker:publish
-              curl --user ${CIRCLE_API_TOKEN}: \
-                --data build_parameters[CIRCLE_JOB]=deploy_to_gce \
-                --data build_parameters[VERSION_TO_DEPLOY]=$(git describe --tags) \
-                --data revision=$CIRCLE_SHA1 \
-                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
+#              curl --user ${CIRCLE_API_TOKEN}: \
+#                --data build_parameters[CIRCLE_JOB]=deploy_to_gce \
+#                --data build_parameters[VERSION_TO_DEPLOY]=$(git describe --tags) \
+#                --data revision=$CIRCLE_SHA1 \
+#                https://circleci.com/api/v1.1/project/github/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/tree/$CIRCLE_BRANCH
             fi
   publish_api_client:
     working_directory: /
