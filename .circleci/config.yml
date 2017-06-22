@@ -24,7 +24,7 @@ jobs:
               # build
               sbt "apiClientJs/fullOptJS"
               cd api-client-js
-              cp -f target/scala-2.12/api-client-js-opt.js api-client-js/src/main/resources/localbuild/lib/index.js
+              cp -f target/scala-2.12/api-client-js-opt.js src/main/resources/localbuild/lib/index.js
               cd ..
 
               # store version
