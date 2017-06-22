@@ -96,14 +96,14 @@ workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build
-      - publish_api_client
+      - build:
+      - publish_api_client:
           requires:
             - build
           filters:
             branches:
               only: master
-      - deploy_to_gce
+      - deploy_to_gce:
           requires:
             - build
             - publish_api_client
