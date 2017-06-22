@@ -69,7 +69,7 @@ jobs:
   deploy_to_gce:
     working_directory: /
     docker:
-      - image: google/cloud-sdk
+      - image: google/cloud-sdk:159.0.0-slim
     steps:
       - run:
           name: Authenticate
@@ -78,6 +78,9 @@ jobs:
             export GOOGLE_APPLICATION_CREDENTIALS=${HOME}/gcloud-service-key.json
             gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
       - run:
+          name: Install Kube Control
+          command: apt-get install -y kubectl
+      - run:
           name: Select cluster
           command: |
             gcloud config set project pairing-buddy
@@ -85,7 +88,6 @@ jobs:
       - run:
           name: Deploy
           command: |
-            gcloud components install kubectl
             kubectl set image deployments/scala-fun-backend scala-fun-backend=spikerlabs/scala-fun-backend:$VERSION_TO_DEPLOY
 workflows:
   version: 2
