@@ -18,13 +18,13 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
 
               # create folders for the artifacts
-              mkdir /tmp/api-client-js
-              mkdir /tmp/api-client-js/lib
+              mkdir api-client-js/src/main/resources/localbuild
+              mkdir api-client-js/src/main/resources/localbuild/lib
 
               # build
               sbt "apiClientJs/fullOptJS"
               cd api-client-js
-              cp -f target/scala-2.12/api-client-js-opt.js /tmp/api-client-js/lib/index.js
+              cp -f target/scala-2.12/api-client-js-opt.js api-client-js/src/main/resources/localbuild/lib/index.js
               cd ..
 
               # store version
@@ -33,15 +33,14 @@ jobs:
 
               # prepare artifacts
               cd api-client-js/src/main/resources
-              sed "s/%%VERSION%%/$(cat "/tmp/version")/" package.template.json > /tmp/api-client-js/package.json
-              cp index.js   /tmp/api-client-js/index.js
-              cp index.d.ts /tmp/api-client-js/index.d.ts
-              cd /tmp
-              tar -zcvf api-client-js.tar.gz api-client-js
+              sed "s/%%VERSION%%/$(cat "/tmp/version")/" package.template.json > localbuild/package.json
+              cp index.js   localbuild/index.js
+              cp index.d.ts localbuild/index.d.ts
             fi
-      - store_artifacts:
-          path: /tmp/api-client-js.tar.gz
-          destination: api-client-js.tar.gz
+      - persist_to_workspace:
+          root: api-client-js/src/main/resources
+          paths:
+            - localbuild
       - setup_remote_docker
       - deploy:
           name: Publish API image to Docker Hub
@@ -56,21 +55,17 @@ jobs:
     docker:
       - image: node:6
     steps:
-      - run:
-          name: Get artifacts from original build
-          command: |
-            export GET_ARTIFACT_URL=https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/${BUILD_NUM_WITH_ARTIFACTS}/artifacts\?circle-token\=${CIRCLE_API_TOKEN}
-            curl $(curl ${GET_ARTIFACT_URL} | grep -o 'https://[^"]*')\?circle-token\=${CIRCLE_API_TOKEN} > api-client-js.tar.gz
-            tar -xf api-client-js.tar.gz
+      - attach_workspace:
+          at: /tmp
       - run:
           name: Pack the npm package
-          command: cd api-client-js && npm pack
+          command: cd /tmp/localbuild && npm pack
       - run:
           name: Authenticate with NPM
           command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       - run:
           name: Publish npm package to repository
-          command: npm publish $(ls api-client-js/scala-fun-client-*.tgz)
+          command: npm publish $(ls /tmp/localbuild/scala-fun-client-*.tgz)
   deploy_to_gce:
     working_directory: /
     docker:
