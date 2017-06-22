@@ -1,22 +1,4 @@
 version: 2
-workflows:
-  version: 2
-  build_and_deploy:
-    jobs:
-      - build
-      - publish_api_client
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-      - deploy_to_gce
-          requires:
-            - build
-            - publish_api_client
-          filters:
-            branches:
-              only: master
 jobs:
   build:
     working_directory: /tmp/build
@@ -122,3 +104,21 @@ jobs:
           command: |
             gcloud components install kubectl
             kubectl set image deployments/scala-fun-backend scala-fun-backend=spikerlabs/scala-fun-backend:$VERSION_TO_DEPLOY
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - publish_api_client
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - deploy_to_gce
+          requires:
+            - build
+            - publish_api_client
+          filters:
+            branches:
+              only: master
