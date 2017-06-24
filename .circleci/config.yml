@@ -29,11 +29,12 @@ jobs:
 
               # store version
               sbt version
-              sbt -no-colors --info ";project apiClientJs; version" | tail -1 | sed 's/\[info\][^0-9a-zA-Z]*//' | sed 's/\-[a-zA-Z].*$//' > /tmp/version
+              sbt -no-colors --info ";project apiClientJs; version" | tail -1 | sed 's/\[info\][^0-9a-zA-Z]*//' | sed 's/\-[a-zA-Z].*$//' > version-of-api-client-js
+              git describe --tags > version-of-backend
 
               # prepare artifacts
               cd api-client-js/src/main/resources
-              sed "s/%%VERSION%%/$(cat "/tmp/version")/" package.template.json > localbuild/package.json
+              sed "s/%%VERSION%%/$(cat "/tmp/build/version-of-api-client-js")/" package.template.json > localbuild/package.json
               cp index.js   localbuild/index.js
               cp index.d.ts localbuild/index.d.ts
             fi
@@ -41,6 +42,11 @@ jobs:
           root: api-client-js/src/main/resources
           paths:
             - localbuild
+      - persist_to_workspace:
+          root: .
+          paths:
+            - version-of-api-client-js
+            - version-of-backend
       - setup_remote_docker
       - deploy:
           name: Publish API image to Docker Hub
@@ -71,6 +77,8 @@ jobs:
     docker:
       - image: google/cloud-sdk:159.0.0-slim
     steps:
+      - attach_workspace:
+          at: /tmp
       - run:
           name: Authenticate
           command: |
@@ -88,6 +96,7 @@ jobs:
       - run:
           name: Deploy
           command: |
+            export $VERSION_TO_DEPLOY=$(cat "/tmp/version-of-backend")
             kubectl set image deployments/scala-fun-backend scala-fun-backend=spikerlabs/scala-fun-backend:$VERSION_TO_DEPLOY
 workflows:
   version: 2
