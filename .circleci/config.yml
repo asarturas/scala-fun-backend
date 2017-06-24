@@ -96,7 +96,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            export $VERSION_TO_DEPLOY=$(cat "/tmp/version-of-backend")
+            export VERSION_TO_DEPLOY=$(cat "/tmp/version-of-backend")
             kubectl set image deployments/scala-fun-backend scala-fun-backend=spikerlabs/scala-fun-backend:$VERSION_TO_DEPLOY
 workflows:
   version: 2
