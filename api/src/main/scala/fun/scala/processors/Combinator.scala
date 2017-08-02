@@ -1,17 +1,11 @@
 package fun.scala.processors
 
 import fun.scala.data.{SourcedVideoMetadata, VideoMetadata}
-import monix.eval.Task
-
-import scala.concurrent.Future
 
 class Combinator {
-  def combine(videoProcessing: List[Task[SourcedVideoMetadata]]): Future[Iterable[VideoMetadata]] = {
-    import monix.execution.Scheduler.Implicits.global
-    for {
-      processedVideos <- Task.gatherUnordered(videoProcessing).runAsync
-    } yield processedVideos.groupBy(_.video).map { case (sourcedVideo, listOfMetadata) =>
-      listOfMetadata.fold(SourcedVideoMetadata(sourcedVideo)) { (v1: SourcedVideoMetadata, v2: SourcedVideoMetadata) =>
+  def combine(videoProcessing: List[SourcedVideoMetadata]): Iterable[VideoMetadata] = {
+    videoProcessing.groupBy(_.video).map { case (sourcedVideo, listOfMetadata) =>
+      listOfMetadata.fold(SourcedVideoMetadata(sourcedVideo)) { (v1, v2) =>
         SourcedVideoMetadata(
           sourcedVideo,
           v1.embedUrl.orElse(v2.embedUrl),

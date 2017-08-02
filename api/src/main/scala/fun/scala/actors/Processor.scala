@@ -4,6 +4,8 @@ import akka.actor.{Actor, ActorLogging, Props}
 import fun.scala.actors.Messages.{ProcessSourcedVideos, StoreVideoMetadata}
 import fun.scala.processors.Combinator
 
+import scala.util.{Failure, Success}
+
 object Processor {
   def create(processors: List[fun.scala.processors.Processor]): Props = Props(new Processor(processors))
 }
@@ -18,14 +20,19 @@ class Processor(processors: List[fun.scala.processors.Processor]) extends Actor 
   }
 
   def receive: Receive = {
-    case ProcessSourcedVideos(videos) =>
+    case ProcessSourcedVideos(videosTask) =>
+      log.info("processor received a task")
+
       import monix.execution.Scheduler.Implicits.global
-      log.info("processor received")
-      for {
-        futureProcessedVideos <- processors.map(_.process(videos))
-      } yield for {
-        processedVideos <- futureProcessedVideos
-        combined <- combinator.combine(processedVideos)
-      } yield context.system.actorSelection("user/storage") ! StoreVideoMetadata(combined)
+      val processTask = for {
+        videos <- videosTask
+      } yield combinator.combine(processors.flatMap(_.process(videos)))
+      processTask.memoizeOnSuccess.runAsync.onComplete {
+        case Success(processedVideos) =>
+          context.system.actorSelection("user/storage") ! StoreVideoMetadata(processedVideos)
+        case Failure(e) =>
+          log.error(e.getMessage)
+          log.debug(e.getStackTrace.toString)
+      }
   }
 }

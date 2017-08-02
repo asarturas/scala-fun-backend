@@ -1,10 +1,10 @@
 package fun.scala.sourcers
 
 import fun.scala.data.SourcedVideo
-import monix.execution.CancelableFuture
+import monix.eval.Task
 
 trait Sourcer {
-  def collect(): CancelableFuture[List[SourcedVideo]]
+  def collect(): Task[List[SourcedVideo]]
 }
 
 trait SourcerConfig

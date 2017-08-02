@@ -3,20 +3,13 @@ package fun.scala.processors
 import com.netaporter.uri.Uri
 import fun.scala.data.{Service, SourcedVideo, SourcedVideoMetadata}
 import fun.scala.data.Service.{Vimeo, Youtube}
-import monix.eval.Task
-
-import scala.concurrent.Future
 
 class VideoIdProcessor extends Processor {
-  def process(collectedVideos: Future[List[SourcedVideo]]): Future[List[Task[SourcedVideoMetadata]]] = {
-    import monix.execution.Scheduler.Implicits.global
+  def process(collectedVideos: List[SourcedVideo]): List[SourcedVideoMetadata] = {
     for {
-      videos <- collectedVideos
-    } yield videos.map(
-      video => Task.eval(
-        SourcedVideoMetadata(video, None, id = videoId(video.service, video.url), plays = None, likes = None)
-      )
-    )
+      video <- collectedVideos
+      videoId <- videoId(video.service, video.url)
+    } yield SourcedVideoMetadata(video, None, id = Some(videoId), plays = None, likes = None)
   }
 
   def videoId(service: Service, url: Uri): Option[String] = {

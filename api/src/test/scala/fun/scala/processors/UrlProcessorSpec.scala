@@ -43,10 +43,7 @@ class UrlProcessorSpec extends FlatSpec with Matchers {
       sourcedVideo2,
       sourcedVideo3
     )
-    val processingTasks = new UrlProcessor().process(collectedVideos)
-    import monix.execution.Scheduler.Implicits.global
-    val result = Await.result(Task.sequence(processingTasks).runAsync, 5.seconds)
-    result.flatten should be(List(
+    new UrlProcessor().process(collectedVideos) should be(List(
       SourcedVideoMetadata(
         sourcedVideo1,
         Some(Uri.parse("https://www.youtube.com/embed/HXIJcIivMH?autoplay=1&modestbranding=1&rel=0&showinfo=0&autohide=1")),
