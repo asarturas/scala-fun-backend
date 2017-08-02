@@ -19,9 +19,13 @@ class Processor(processors: List[fun.scala.processors.Processor]) extends Actor 
 
   def receive: Receive = {
     case ProcessSourcedVideos(videos) =>
+      import monix.execution.Scheduler.Implicits.global
       log.info("processor received")
-      val result = processors.map(_.process(videos)).fold(List())(_ ++ _)
-      val metadata = combinator.combine(result)
-      context.system.actorSelection("user/storage") ! StoreVideoMetadata(metadata)
+      for {
+        futureProcessedVideos <- processors.map(_.process(videos))
+      } yield for {
+        processedVideos <- futureProcessedVideos
+        combined <- combinator.combine(processedVideos)
+      } yield context.system.actorSelection("user/storage") ! StoreVideoMetadata(combined)
   }
 }

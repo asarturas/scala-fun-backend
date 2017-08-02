@@ -3,14 +3,14 @@ package fun.scala.processors
 import fun.scala.data.{SourcedVideoMetadata, VideoMetadata}
 import monix.eval.Task
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.Future
 
 class Combinator {
-  def combine(videoProcessing: List[Task[Option[SourcedVideoMetadata]]]): Iterable[VideoMetadata] = {
+  def combine(videoProcessing: List[Task[SourcedVideoMetadata]]): Future[Iterable[VideoMetadata]] = {
     import monix.execution.Scheduler.Implicits.global
-    val processedVideos = Await.result(Task.gatherUnordered(videoProcessing).runAsync, 5.seconds)
-    processedVideos.flatten.groupBy(_.video).map { case (sourcedVideo, listOfMetadata) =>
+    for {
+      processedVideos <- Task.gatherUnordered(videoProcessing).runAsync
+    } yield processedVideos.groupBy(_.video).map { case (sourcedVideo, listOfMetadata) =>
       listOfMetadata.fold(SourcedVideoMetadata(sourcedVideo)) { (v1: SourcedVideoMetadata, v2: SourcedVideoMetadata) =>
         SourcedVideoMetadata(
           sourcedVideo,
