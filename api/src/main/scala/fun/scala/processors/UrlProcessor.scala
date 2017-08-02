@@ -3,18 +3,13 @@ package fun.scala.processors
 import com.netaporter.uri.Uri
 import fun.scala.data.{Service, SourcedVideo, SourcedVideoMetadata}
 import fun.scala.data.Service.{Vimeo, Youtube}
-import monix.eval.Task
 
 class UrlProcessor extends Processor {
-  def process(collectedVideos: List[SourcedVideo]): List[Task[Option[SourcedVideoMetadata]]] = {
-    collectedVideos.map {
-      case video @ SourcedVideo(url, title, service, source) =>
-        Task.eval(
-          embedUrl(service, url).map { embedUrl =>
-            SourcedVideoMetadata(video, Some(embedUrl), id = None, plays = None, likes = None)
-          }
-        )
-    }
+  def process(collectedVideos: List[SourcedVideo]): List[SourcedVideoMetadata] = {
+    for {
+      video <- collectedVideos
+      embedUrl <- embedUrl(video.service, video.url)
+    } yield SourcedVideoMetadata(video, Some(embedUrl), id = None, plays = None, likes = None)
   }
 
   def embedUrl(service: Service, url: Uri): Option[Uri] = {

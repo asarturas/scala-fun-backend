@@ -13,12 +13,11 @@ object Storage {
 
 class Storage extends Actor with ActorLogging {
 
-//  val runtimeRepository = new Repository[Video](new RuntimeEventStore(), VideoFactory)
   val runtimeRepository = new Repository[Video](new GetEventStore(), VideoAggregate.factory)
 
   def receive: Receive = {
     case StoreVideoMetadata(metadata) =>
-      log.info("got video metadata")
+      log.info("got video metadata to store")
       metadata.foreach { m =>
         val id = VideoAggregateId(AggregateIdString(m.idSeed))
         val video = runtimeRepository.getById(id).getOrElse(runtimeRepository.createAs(m.idSeed))

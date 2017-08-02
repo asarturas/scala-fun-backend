@@ -9,9 +9,7 @@ import io.circe.Decoder
 import io.circe.generic.semiauto._
 import fun.scala.data.{Service, Source, SourcedVideo}
 import fun.scala.sourcers.PocketSourcer.{Collection, Item, Pocket}
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import monix.eval.Task
 
 object PocketSourcer {
   case object Pocket extends Source
@@ -27,9 +25,9 @@ object PocketSourcer {
 
 class PocketSourcer(consumerKey: String, accessToken: String) extends Sourcer {
 
-  def collect(): List[SourcedVideo] = {
+  def collect(): Task[List[SourcedVideo]] = {
     import fun.scala.sourcers.PocketSourcer.Decoders._
-    val sourceTask = requestToCollect()
+    requestToCollect()
       .map { response =>
         decode[Collection](response.body) match {
           case Right(Collection(list)) =>
@@ -39,11 +37,9 @@ class PocketSourcer(consumerKey: String, accessToken: String) extends Sourcer {
           case Left(message) =>
             println(response.body)
             println(message)
-            Nil
+            List.empty
         }
       }
-    import monix.execution.Scheduler.Implicits.global
-    Await.result(sourceTask.runAsync, 30.seconds)
   }
 
   implicit val client = new OkHttpClient

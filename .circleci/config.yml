@@ -37,6 +37,10 @@ jobs:
               sed "s/%%VERSION%%/$(cat "/tmp/build/version-of-api-client-js")/" package.template.json > localbuild/package.json
               cp index.js   localbuild/index.js
               cp index.d.ts localbuild/index.d.ts
+            else
+              touch api-client-js/src/main/resources/localbuild
+              touch version-of-api-client-js
+              touch version-of-backend
             fi
       - persist_to_workspace:
           root: api-client-js/src/main/resources

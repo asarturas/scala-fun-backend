@@ -11,14 +11,14 @@ class CombinatorSpec extends FlatSpec with Matchers {
     val video2 = SourcedVideo(Uri.parse("http://asm.lt"), "title2", Service.Unknown, Source.Unknown)
 
     val processTasks = List(
-      Task.eval(Some(SourcedVideoMetadata(
-        video1, embedUrl = Some(Uri.parse("http://scala.fun/embed")), likes = Some(2), plays = Some(7)))
+      SourcedVideoMetadata(
+        video1, embedUrl = Some(Uri.parse("http://scala.fun/embed")), likes = Some(2), plays = Some(7)
       ),
-      Task.eval(Some(SourcedVideoMetadata(
-        video2, embedUrl = Some(Uri.parse("http://asm.lt/another-embed")), likes = Some(2)))
+      SourcedVideoMetadata(
+        video2, embedUrl = Some(Uri.parse("http://asm.lt/another-embed")), likes = Some(2)
       ),
-      Task.eval(Some(SourcedVideoMetadata(
-        video1, embedUrl = None, likes = Some(3)))
+      SourcedVideoMetadata(
+        video1, embedUrl = None, likes = Some(3)
       )
     )
     new Combinator().combine(processTasks).toSet should be(

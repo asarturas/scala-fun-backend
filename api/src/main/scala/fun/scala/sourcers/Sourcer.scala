@@ -4,7 +4,7 @@ import fun.scala.data.SourcedVideo
 import monix.eval.Task
 
 trait Sourcer {
-  def collect(): List[SourcedVideo]
+  def collect(): Task[List[SourcedVideo]]
 }
 
 trait SourcerConfig

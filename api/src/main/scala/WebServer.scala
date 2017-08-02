@@ -46,18 +46,18 @@ object WebServer {
     implicit val executionContext = system.dispatcher
 
     // app actors
-    val (consumerKey, accessToken) = (config.getString("pocketConsumerKey"), config.getString("pocketAccessToken"))
-    val sourcer = system.actorOf(
-      Sourcer.create(PocketSourcer.Pocket, PocketConfig(consumerKey, accessToken)),
-      "pocket-sourcer"
-    )
-    system.actorOf(
-      Processor.create(List(new UrlProcessor(), new VideoIdProcessor())),
-      "processor"
-    )
     val storage = system.actorOf(
       Props[Storage],
       "storage"
+    )
+    val processor = system.actorOf(
+      Processor.create(List(new UrlProcessor(), new VideoIdProcessor()), storage),
+      "processor"
+    )
+    val (consumerKey, accessToken) = (config.getString("pocketConsumerKey"), config.getString("pocketAccessToken"))
+    val sourcer = system.actorOf(
+      Sourcer.create(PocketSourcer.Pocket, PocketConfig(consumerKey, accessToken), processor),
+      "pocket-sourcer"
     )
     sourcer ! CollectVideos()
 
